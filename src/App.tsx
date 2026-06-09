@@ -31,6 +31,13 @@ const PILLARS = [
   },
 ] as const;
 
+
+const FEATURED_ACT = {
+  youtubeVideoId: "XDG9ZwgZG7o",
+  youtubeUrl: "https://youtu.be/XDG9ZwgZG7o",
+  title: "A Chalant act — The Chalant Society",
+} as const;
+
 const SIMULATION = {
   chaos: 0,
   noiseStrength: 0,
@@ -221,6 +228,29 @@ export default function App() {
                   <p className="pillar-description">{pillar.description}</p>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+
+        <section id="in-action" className="section-frame section-content">
+          <div className="page-container chalant-act">
+            <div className="chalant-act-header">
+              <p className="section-kicker">see it in action</p>
+              <h2 className="section-title-large">from hesitation to action</h2>
+              <p className="chalant-act-intro">
+                the story behind a real chalant act—and what it took to show up anyway.
+              </p>
+            </div>
+            <div className="video-embed">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${FEATURED_ACT.youtubeVideoId}?rel=0&modestbranding=1`}
+                title={FEATURED_ACT.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
             </div>
           </div>
         </section>
