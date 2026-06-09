@@ -1,8 +1,21 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ArrowRight, Calendar, MessageCircle, Mail } from "lucide-react";
+import { ArrowRight, Calendar, Instagram, Linkedin, Mail, MessageCircle, Youtube } from "lucide-react";
 
 const Scene = lazy(() => import("./components/Scene"));
 
+const SIMULATION = {
+  chaos: 0,
+  noiseStrength: 0,
+  noiseFrequency: 0.18,
+  returnSpeed: 1.9,
+  baseSize: 0.026,
+  interactionRadius: 2.1,
+  mouseStrength: 3.2,
+  amberColor: "#a84f08",
+  goldColor: "#b88616",
+  standoutColor: "#d8c6a2",
+  resetSignal: 0,
+};
 
 const PILLARS = [
   {
@@ -31,26 +44,20 @@ const PILLARS = [
   },
 ] as const;
 
-
 const FEATURED_ACT = {
   youtubeVideoId: "XDG9ZwgZG7o",
   youtubeUrl: "https://youtu.be/XDG9ZwgZG7o",
   title: "A Chalant act — The Chalant Society",
 } as const;
 
-const SIMULATION = {
-  chaos: 0,
-  noiseStrength: 0,
-  noiseFrequency: 0.18,
-  returnSpeed: 1.9,
-  baseSize: 0.026,
-  interactionRadius: 2.1,
-  mouseStrength: 3.2,
-  amberColor: "#a84f08",
-  goldColor: "#b88616",
-  standoutColor: "#d8c6a2",
-  resetSignal: 0,
-};
+const FOOTER_LINKS = {
+  instagram: "https://www.instagram.com/thechalantsociety/",
+  linkedin: "https://www.linkedin.com/in/rami-m",
+  email: "ramimaalouf.me@gmail.com",
+  discord: "https://discord.gg/chalant",
+  youtube: FEATURED_ACT.youtubeUrl,
+  coaching: "https://cal.com/rami-maalouf/chalant-discovery",
+} as const;
 
 function useScrollProgress() {
   const [progress, setProgress] = useState(0);
@@ -121,7 +128,7 @@ export default function App() {
           <div className="page-container">
             {/* <p className="eyebrow">courage · charisma · care · curiosity</p> */}
             <h1 className="hero-title">
-              you&apos;ve been trained to be nonchalant.
+              you&apos;ve been trained to be nonchalant
             </h1>
             <p className="hero-subcopy">
               the chalant society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
@@ -143,9 +150,9 @@ export default function App() {
           <div className="page-container statement-block">
             {/* <p className="section-kicker">the manifesto</p> */}
             <h2>
-              apathy is an armor.
+              apathy is an armor
               <br />
-              it is also a cage.
+              it is also a cage
             </h2>
             <div className="spoken-copy">
               <p>say less. want less. risk less.</p>
@@ -159,9 +166,8 @@ export default function App() {
         <section id="community" className="section-frame section-content">
           <div className="page-container">
             <h2 className="section-title-large">two ways to practice being chalant</h2>
-            
+
             <div className="offerings-grid">
-              {/* Card 1: The Community & Meetups (Priority 1) */}
               <div className="offering-card">
                 <div className="card-content">
                   <h3>the weekly challenges & discord</h3>
@@ -185,7 +191,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Card 2: 1-on-1 Coaching (Priority 2) */}
               <div id="coaching" className="offering-card">
                 <div className="card-content">
                   <h3>tailored systems & expansion coaching</h3>
@@ -232,7 +237,6 @@ export default function App() {
           </div>
         </section>
 
-
         <section id="in-action" className="section-frame section-content">
           <div className="page-container chalant-act">
             <div className="chalant-act-header">
@@ -275,6 +279,51 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        <footer className="site-footer">
+          <div className="page-container site-footer-inner">
+            <div className="site-footer-top">
+              <a className="site-mark" href="#top">
+                The Chalant Society
+              </a>
+              <nav className="site-footer-links" aria-label="Connect">
+                <a href={FOOTER_LINKS.instagram} target="_blank" rel="noreferrer">
+                  <Instagram size={16} aria-hidden />
+                  instagram
+                </a>
+                <a href={FOOTER_LINKS.linkedin} target="_blank" rel="noreferrer">
+                  <Linkedin size={16} aria-hidden />
+                  linkedin
+                </a>
+                <a href={`mailto:${FOOTER_LINKS.email}?subject=Chalant%20Society%20Inquiry`}>
+                  <Mail size={16} aria-hidden />
+                  email
+                </a>
+                <a href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
+                  <MessageCircle size={16} aria-hidden />
+                  discord
+                </a>
+                <a href={FOOTER_LINKS.youtube} target="_blank" rel="noreferrer">
+                  <Youtube size={16} aria-hidden />
+                  youtube
+                </a>
+              </nav>
+            </div>
+            <div className="site-footer-bottom">
+              <nav className="site-footer-nav" aria-label="Site">
+                <a href="#in-action">in action</a>
+                <a href="#community">the community</a>
+                <a href="#coaching">1-on-1 coaching</a>
+                <a href={FOOTER_LINKS.coaching} target="_blank" rel="noreferrer">
+                  book a call
+                </a>
+              </nav>
+              <p className="site-footer-copy">
+                © {new Date().getFullYear()} the chalant society
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     </main>
   );
