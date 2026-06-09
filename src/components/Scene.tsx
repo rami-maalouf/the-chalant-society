@@ -3,6 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Noise } from "@react-three/postprocessing";
 import { useMemo } from "react";
 import * as THREE from "three";
+import {
+  CAMERA_START_POSITION,
+  sampleCameraRig,
+  sampleScrollReveal,
+} from "../utils/cameraPath";
 import GPGPUParticles from "./GPGPUParticles";
 
 interface SceneProps {
@@ -20,54 +25,13 @@ interface SceneProps {
   scrollProgress: number;
 }
 
-function smoothStep(progress: number) {
-  return progress * progress * (3 - 2 * progress);
-}
-
-// Original rig keyframes — reveal 0 was too close and the scene vanished on the hero.
-const ORIGINAL_CLOSE = {
-  position: new THREE.Vector3(0.12, 0.98, 1.85),
-  target: new THREE.Vector3(0, 0.98, -1.38),
-};
-
-const ORIGINAL_WIDE = {
-  position: new THREE.Vector3(-0.82, 2.1, 7.35),
-  target: new THREE.Vector3(0, 0.32, -3.12),
-};
-
-// Where the scene first became visible (~manifesto / apathy section) on the old curve.
-const MIN_VISIBLE_REVEAL = 0.18;
-
-function sampleOriginalRig(reveal: number, outPosition: THREE.Vector3, outTarget: THREE.Vector3) {
-  outPosition.lerpVectors(ORIGINAL_CLOSE.position, ORIGINAL_WIDE.position, reveal);
-  outTarget.lerpVectors(ORIGINAL_CLOSE.target, ORIGINAL_WIDE.target, reveal);
-}
-
 function CameraRig({ scrollProgress }: { scrollProgress: number }) {
   const { camera } = useThree();
-  const startPosition = useMemo(() => {
-    const position = new THREE.Vector3();
-    sampleOriginalRig(MIN_VISIBLE_REVEAL, position, new THREE.Vector3());
-    return position;
-  }, []);
-  const endPosition = useMemo(() => ORIGINAL_WIDE.position.clone(), []);
-  const startTarget = useMemo(() => {
-    const target = new THREE.Vector3();
-    sampleOriginalRig(MIN_VISIBLE_REVEAL, new THREE.Vector3(), target);
-    return target;
-  }, []);
-  const endTarget = useMemo(() => ORIGINAL_WIDE.target.clone(), []);
   const position = useMemo(() => new THREE.Vector3(), []);
   const target = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
-    const revealProgress = smoothStep(Math.min(1, scrollProgress * 1.08));
-    const orbit = Math.sin(revealProgress * Math.PI) * 0.34;
-
-    position.lerpVectors(startPosition, endPosition, revealProgress);
-    position.x += orbit;
-    target.lerpVectors(startTarget, endTarget, revealProgress);
-
+    sampleCameraRig(scrollProgress, position, target);
     camera.position.lerp(position, 0.075);
     camera.lookAt(target);
   });
@@ -89,13 +53,12 @@ export default function Scene({
   resetSignal,
   scrollProgress,
 }: SceneProps) {
-  const bloomIntensity = 0.75 - smoothStep(Math.min(1, scrollProgress * 1.08)) * 0.28;
+  const bloomIntensity = 0.75 - sampleScrollReveal(scrollProgress) * 0.28;
 
-  const initialPosition = useMemo(() => {
-    const position = new THREE.Vector3();
-    sampleOriginalRig(MIN_VISIBLE_REVEAL, position, new THREE.Vector3());
-    return position;
-  }, []);
+  const initialPosition = useMemo(
+    () => new THREE.Vector3(CAMERA_START_POSITION.x, CAMERA_START_POSITION.y, CAMERA_START_POSITION.z),
+    []
+  );
 
   return (
     <div id="canvas-container" className="w-full h-full relative" style={{ background: "#050508" }}>
