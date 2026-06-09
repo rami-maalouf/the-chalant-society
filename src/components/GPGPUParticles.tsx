@@ -28,6 +28,7 @@ interface GPGPUParticlesProps {
   goldColor: string;
   standoutColor: string;
   resetSignal: number;
+  scrollProgress?: number;
   soloStandout?: boolean;
   renderPeopleMesh?: string;
 }
@@ -138,6 +139,7 @@ function GPGPUParticleSimulation({
   goldColor,
   standoutColor,
   resetSignal,
+  scrollProgress = 0,
   soloStandout = false,
   textureData,
   textureType,
@@ -316,6 +318,7 @@ function GPGPUParticleSimulation({
         uStandoutColor: { value: new THREE.Color(standoutColor) },
         uSoloStandout: { value: soloStandout },
         uUseParticleColor: { value: useParticleColor },
+        uReadabilityScale: { value: 1 },
       },
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -392,6 +395,9 @@ function GPGPUParticleSimulation({
 
     pointsMaterial.uniforms.uPositionTexture.value = currentRT.current.texture;
     pointsMaterial.uniforms.uPulseTime.value = time;
+
+    const reveal = scrollProgress * scrollProgress * (3 - 2 * scrollProgress);
+    pointsMaterial.uniforms.uReadabilityScale.value = 1 - Math.min(1, reveal * 1.08) * 0.42;
   });
 
   useEffect(() => {
