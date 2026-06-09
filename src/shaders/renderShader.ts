@@ -27,10 +27,13 @@ void main() {
   float distanceSize = uBaseSize * (aRandomSize * 0.6 + 0.4);
   
   // Perspective point scaling division (mvPosition.z is negative in view space)
-  gl_PointSize = distanceSize * (280.0 / -mvPosition.z);
-  
-  // Cap size so close-up particle blocks are avoid looking too blocky
-  gl_PointSize = clamp(gl_PointSize, 1.0, 32.0);
+  gl_PointSize = distanceSize * (320.0 / -mvPosition.z);
+
+  if (vStandout > 0.5) {
+    gl_PointSize = clamp(gl_PointSize, 2.5, 64.0);
+  } else {
+    gl_PointSize = clamp(gl_PointSize, 1.0, 32.0);
+  }
 }
 `;
 
@@ -73,19 +76,20 @@ void main() {
     if (uUseParticleColor) {
       float pulse = uSoloStandout ? 1.0 : 0.92 + 0.08 * sin(uPulseTime * 6.0 + colorNoise * 10.0);
       float albedoLuma = dot(vParticleColor, vec3(0.2126, 0.7152, 0.0722));
-      vec3 compressedColor = mix(vParticleColor, vec3(albedoLuma), 0.22);
-      compressedColor *= mix(1.0, 0.54, smoothstep(0.48, 0.88, albedoLuma));
-      particleColor = (compressedColor + vec3(0.014)) * (uSoloStandout ? 1.15 : 1.25) * pulse;
+      vec3 compressedColor = mix(vParticleColor, vec3(albedoLuma), 0.35);
+      compressedColor *= mix(1.0, 0.32, smoothstep(0.38, 0.78, albedoLuma));
+      particleColor = compressedColor * (uSoloStandout ? 0.82 : 0.68) * pulse;
       if (uSoloStandout) {
-        alpha = max(alpha, 0.28);
+        alpha = max(alpha, 0.18);
+      } else {
+        alpha = max(alpha, 0.12);
       }
     } else {
       // Elegant bright sparks that pulse slightly
       float pulse = 0.85 + 0.15 * sin(uPulseTime * 6.0 + colorNoise * 10.0);
-      particleColor = mix(uGoldColor, uStandoutColor, colorNoise * 0.6) * 2.2 * pulse;
+      particleColor = mix(uGoldColor, uStandoutColor, colorNoise * 0.6) * 1.1 * pulse;
     }
-    // Standout elements are tighter and clearer
-    alpha *= uSoloStandout ? 0.9 : 1.05;
+    alpha *= 0.72;
   } else {
     // Ambient crowd lights fade slightly into depth
     alpha *= 0.6;
