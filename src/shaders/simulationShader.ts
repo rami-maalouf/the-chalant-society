@@ -167,9 +167,9 @@ void main() {
   vec3 force = vec3(0.0);
 
   // Force A: Target Snapping
-  // Standout figures snap harder and faster to keep clean visual definition
+  // Standout snaps a bit harder than crowd to keep definition, but not so stiff that mouse play feels locked.
   vec3 toTarget = finalTarget - pos;
-  float snapStrength = standout ? uReturnSpeed * 1.8 : uReturnSpeed;
+  float snapStrength = standout ? uReturnSpeed * 1.55 : uReturnSpeed;
   force += toTarget * snapStrength;
 
   // Force B: Ambient / Turbulent GPU Curl Noise 
@@ -186,14 +186,15 @@ void main() {
 
   // Force C: Interactive mouse cursor reaction pushing particles
   vec3 toMouse = pos - uMousePos;
+  float interactionRadius = standout ? uInteractionRadius * 1.12 : uInteractionRadius;
   float distToMouse = length(toMouse);
-  if (distToMouse < uInteractionRadius && distToMouse > 0.001) {
-    float strengthFactor = (1.0 - (distToMouse / uInteractionRadius));
+  if (distToMouse < interactionRadius && distToMouse > 0.001) {
+    float strengthFactor = 1.0 - (distToMouse / interactionRadius);
     // Soft easing curve
     strengthFactor = strengthFactor * strengthFactor;
-    
-    // Push away from cursor
-    force += normalize(toMouse) * strengthFactor * uMouseStrength;
+
+    float mousePush = standout ? uMouseStrength * 1.22 : uMouseStrength;
+    force += normalize(toMouse) * strengthFactor * mousePush;
   }
 
   // Constrain extreme speeds to prevent coordinates from expanding to infinity
