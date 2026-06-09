@@ -70,7 +70,7 @@ export default function App() {
             The Chalant Society
           </a>
           <nav className="hidden items-center gap-8 md:flex">
-            <a className="nav-link" href="#manifesto">the mission</a>
+            <a className="nav-link" href="#in-action">in action</a>
             <a className="nav-link" href="#community">the community</a>
             <a className="nav-link" href="#coaching">1-on-1 coaching</a>
           </nav>
@@ -82,14 +82,14 @@ export default function App() {
           </div>
         </header>
 
-        <section id="top" className="section-frame min-h-screen items-end pb-[12vh] pt-28">
-          <div className="max-w-[88rem] w-full">
-            <p className="eyebrow">courage / charisma / care</p>
+        <section id="top" className="section-frame section-hero">
+          <div className="page-container">
+            {/* <p className="eyebrow">courage · charisma · care · curiosity</p> */}
             <h1 className="hero-title">
               you&apos;ve been trained to be nonchalant.
             </h1>
             <p className="hero-subcopy">
-              caring is dangerous. aloof is safe. we built the permission structure to break the script: to care out loud, expand your comfort zone, and show up with unapologetic effort.
+              the chalant society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
             </p>
             <div className="cta-row">
               <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
@@ -104,9 +104,9 @@ export default function App() {
           </div>
         </section>
 
-        <section id="manifesto" className="section-frame min-h-screen justify-center">
-          <div className="statement-block">
-            <p className="section-kicker">the manifesto</p>
+        <section id="manifesto" className="section-frame section-content">
+          <div className="page-container statement-block">
+            {/* <p className="section-kicker">the manifesto</p> */}
             <h2>
               apathy is an armor.
               <br />
@@ -121,15 +121,13 @@ export default function App() {
           </div>
         </section>
 
-        <section id="community" className="section-frame min-h-screen justify-center py-20">
-          <div className="w-full max-w-[88rem]">
-            <p className="section-kicker">our offerings</p>
-            <h2 className="section-title-large">we build the permission structure.</h2>
+        <section id="community" className="section-frame section-content">
+          <div className="page-container">
+            <h2 className="section-title-large">two ways to practice being chalant</h2>
             
             <div className="offerings-grid">
               {/* Card 1: The Community & Meetups (Priority 1) */}
-              <div className="offering-card priority-primary">
-                <span className="card-badge">priority 01 / community</span>
+              <div className="offering-card">
                 <div className="card-content">
                   <h3>the weekly challenges & discord</h3>
                   <p>
@@ -154,7 +152,6 @@ export default function App() {
 
               {/* Card 2: 1-on-1 Coaching (Priority 2) */}
               <div id="coaching" className="offering-card">
-                <span className="card-badge">priority 02 / coaching</span>
                 <div className="card-content">
                   <h3>tailored systems & expansion coaching</h3>
                   <p>
@@ -188,9 +185,9 @@ export default function App() {
           </div>
         </section>
 
-        <section id="show-up" className="section-frame min-h-screen justify-end pb-[12vh]">
-          <div className="invitation">
-            <p className="section-kicker">the invitation</p>
+        <section id="show-up" className="section-frame section-closer">
+          <div className="page-container invitation">
+            {/* <p className="section-kicker">the invitation</p> */}
             <h2>are you chalant enough to show up?</h2>
             <p>
               you do not need to become fearless. you just need one room where effort is celebrated, and a group of people willing to go first.
