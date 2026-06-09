@@ -3,6 +3,34 @@ import { ArrowRight, Calendar, MessageCircle, Mail } from "lucide-react";
 
 const Scene = lazy(() => import("./components/Scene"));
 
+
+const PILLARS = [
+  {
+    name: "courage",
+    tagline: "try in public",
+    description:
+      "show up before you feel ready. take the shot, ask the question, and let rejection land where it may.",
+  },
+  {
+    name: "charisma",
+    tagline: "presence that lands",
+    description:
+      "warmth without performance. make people feel seen without shrinking yourself to stay safe.",
+  },
+  {
+    name: "care",
+    tagline: "show the care",
+    description:
+      "we're not afraid to show that we care—on this site, in the discord, in how we debrief. no ironic distance, just honest investment.",
+  },
+  {
+    name: "curiosity",
+    tagline: "stay open",
+    description:
+      "ask what you actually want to know. trade rehearsed indifference for genuine wonder.",
+  },
+] as const;
+
 const SIMULATION = {
   chaos: 0,
   noiseStrength: 0,
@@ -177,11 +205,23 @@ export default function App() {
           </div>
         </section>
 
-        <section className="section-frame min-h-[84vh] justify-center">
-          <div className="three-cs" aria-label="The three C's">
-            <span>courage</span>
-            <span>charisma</span>
-            <span>care</span>
+        <section id="pillars" className="section-frame section-content">
+          <div className="page-container">
+            <p className="section-kicker">what we practice</p>
+            <h2 className="section-title-large">the four c&apos;s</h2>
+            <p className="pillars-intro">
+              nonchalance is the default. these are the muscles we train together—on camera, in discord, and out in the world.
+            </p>
+            <div className="pillars-grid" aria-label="Our four pillars">
+              {PILLARS.map((pillar, index) => (
+                <article key={pillar.name} className="pillar-card">
+                  <span className="pillar-index">0{index + 1}</span>
+                  <h3 className="pillar-name">{pillar.name}</h3>
+                  <p className="pillar-tagline">{pillar.tagline}</p>
+                  <p className="pillar-description">{pillar.description}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
