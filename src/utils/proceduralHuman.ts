@@ -822,8 +822,8 @@ function sampleBonePoint(bone: Bone, layout: FigureLayout, out: { x: number; y: 
 }
 
 export const CROWD_LAYOUTS: FigureLayout[] = [
-  // 0. The Standout Figure (Centered, larger, facing camera!)
-  { poseType: 0, offsetX: 0, offsetY: -1.0, offsetZ: 0.0, rotationY: 0.0, scale: 1.18, isStandout: true, bodyType: "athletic", gender: "male", hairStyle: "short", expression: "excited" },
+  // 0. The Standout Figure (centered, larger — Math.PI counter-rotates scanned asset yaw so the face points at the camera)
+  { poseType: 0, offsetX: 0, offsetY: -1.0, offsetZ: 0.0, rotationY: Math.PI, scale: 1.32, isStandout: true, bodyType: "athletic", gender: "male", hairStyle: "short", expression: "excited" },
   
   // 1. Inner Circle Background Left
   { poseType: 1, offsetX: -1.8, offsetY: -1.0, offsetZ: -1.5, rotationY: 0.35, scale: 1.1, isStandout: false, bodyType: "volumetric", gender: "female", hairStyle: "long", expression: "none" },
@@ -934,9 +934,23 @@ export function generateCrowdTextures(
       let worldZ: number;
 
       if (standoutPositions) {
-        worldX = standoutPositions[i * 3 + 0];
-        worldY = standoutPositions[i * 3 + 1];
-        worldZ = standoutPositions[i * 3 + 2];
+        const sourceX = standoutPositions[i * 3 + 0];
+        // Subtract standout footY (-1.12) to center Y at 0 before applying scale/offset, matching the scanned crowd figures
+        const sourceY = standoutPositions[i * 3 + 1] - (-1.12);
+        const sourceZ = standoutPositions[i * 3 + 2];
+
+        const angle = layout.rotationY;
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+
+        // Rotate around Y-axis
+        const rx = sourceX * cosA - sourceZ * sinA;
+        const rz = sourceX * sinA + sourceZ * cosA;
+
+        // Apply scale & offsets
+        worldX = rx * layout.scale + layout.offsetX;
+        worldY = sourceY * layout.scale + layout.offsetY;
+        worldZ = rz * layout.scale + layout.offsetZ;
       } else if (scannedCrowdPositions) {
         const sourceCount = scannedCrowdPositions.length / 3;
         const sourceIndex = (scannedOffset + i * scannedStride) % sourceCount;
@@ -990,16 +1004,21 @@ export function generateCrowdTextures(
       // Store standout flag in Alpha
       targetPositions[idx * 4 + 3] = layout.isStandout ? 1.0 : 0.0;
 
-      // Initial coordinates: We pack the initial positions scattered around in a wide sphere
-      // with a soft vortex shape to allow beautiful initial explosion-to-silhouette morph
-      const initRadius = 4.0 + Math.random() * 8.0;
-      const initAngle = Math.random() * Math.PI * 2.0;
-      const initHeight = (Math.random() - 0.5) * 6.0;
+      // Standout spawns in-place so the portrait is visible on first paint.
+      // Crowd particles still fly in from a dispersed field.
+      if (layout.isStandout) {
+        initialPositions[idx * 4 + 0] = worldX;
+        initialPositions[idx * 4 + 1] = worldY;
+        initialPositions[idx * 4 + 2] = worldZ;
+      } else {
+        const initRadius = 4.0 + Math.random() * 8.0;
+        const initAngle = Math.random() * Math.PI * 2.0;
+        const initHeight = (Math.random() - 0.5) * 6.0;
 
-      initialPositions[idx * 4 + 0] = Math.cos(initAngle) * initRadius;
-      initialPositions[idx * 4 + 1] = initHeight;
-      initialPositions[idx * 4 + 2] = Math.sin(initAngle) * initRadius;
-      // Also tag standout
+        initialPositions[idx * 4 + 0] = Math.cos(initAngle) * initRadius;
+        initialPositions[idx * 4 + 1] = initHeight;
+        initialPositions[idx * 4 + 2] = Math.sin(initAngle) * initRadius;
+      }
       initialPositions[idx * 4 + 3] = layout.isStandout ? 1.0 : 0.0;
     }
   }
