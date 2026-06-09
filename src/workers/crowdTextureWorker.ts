@@ -1,4 +1,4 @@
-import { generateCrowdTextures } from "../utils/proceduralHuman";
+import { densifyStandoutHead, generateCrowdTextures } from "../utils/proceduralHuman";
 
 interface CrowdTextureWorkerRequest {
   width: number;
@@ -63,20 +63,25 @@ workerScope.onmessage = async (event: MessageEvent<CrowdTextureWorkerRequest>) =
   const scannedCrowdPositions = crowdPositions.filter(
     (positions): positions is Float32Array => Boolean(positions)
   );
+  const standoutForScene = standoutPositions
+    ? densifyStandoutHead(standoutPositions, particleColors, standoutParticleCount)
+    : null;
+
   const { targetPositions, initialPositions } = generateCrowdTextures(width, height, {
-    standoutPositions,
+    standoutPositions: standoutForScene?.positions ?? standoutPositions,
     scannedCrowdPositions,
   });
 
   const message = {
     targetPositions,
     initialPositions,
-    particleColors: particleColors ?? undefined,
+    particleColors: standoutForScene?.colors ?? particleColors ?? undefined,
     usedScannedStandout: Boolean(standoutPositions),
   };
   const transfer = [targetPositions.buffer, initialPositions.buffer] as Transferable[];
-  if (particleColors) {
-    transfer.push(particleColors.buffer);
+  const colorsToTransfer = standoutForScene?.colors ?? particleColors;
+  if (colorsToTransfer) {
+    transfer.push(colorsToTransfer.buffer);
   }
 
   workerScope.postMessage(
