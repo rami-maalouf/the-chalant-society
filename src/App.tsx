@@ -53,7 +53,7 @@ const FEATURED_ACT = {
 const FOOTER_LINKS = {
   instagram: "https://www.instagram.com/thechalantsociety/",
   linkedin: "https://www.linkedin.com/in/rami-m",
-  email: "ramimaalouf.me@gmail.com",
+  email: "chalant@ramimaalouf.com",
   discord: "https://discord.gg/chalant",
   youtube: FEATURED_ACT.youtubeUrl,
   coaching: "https://cal.com/rami-maalouf/chalant-discovery",
@@ -207,7 +207,7 @@ export default function App() {
                     schedule a call
                     <ArrowRight size={18} />
                   </a>
-                  <a className="secondary-cta" href="mailto:ramimaalouf.me@gmail.com?subject=Chalant%20Society%20Coaching%20Inquiry">
+                  <a className="secondary-cta" href={`mailto:${FOOTER_LINKS.email}?subject=Chalant%20Society%20Coaching%20Inquiry`}>
                     <Mail size={18} />
                     inquire via email
                   </a>
@@ -272,7 +272,7 @@ export default function App() {
                 join the community
                 <ArrowRight size={18} />
               </a>
-              <a className="secondary-cta" href="mailto:ramimaalouf.me@gmail.com?subject=Chalant%20Society%20Coaching%20Inquiry">
+              <a className="secondary-cta" href={`mailto:${FOOTER_LINKS.email}?subject=Chalant%20Society%20Coaching%20Inquiry`}>
                 <Mail size={18} />
                 apply for coaching
               </a>
