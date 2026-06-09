@@ -7,7 +7,7 @@ const SIMULATION = {
   chaos: 0,
   noiseStrength: 0,
   noiseFrequency: 0.18,
-  returnSpeed: 1.35,
+  returnSpeed: 1.9,
   baseSize: 0.026,
   interactionRadius: 2.1,
   mouseStrength: 3.2,
@@ -48,34 +48,20 @@ function useScrollProgress() {
   return progress;
 }
 
-function useDeferredSceneReady() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setReady(true));
-
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  return ready;
-}
-
 export default function App() {
   const scrollProgress = useScrollProgress();
-  const sceneReady = useDeferredSceneReady();
 
   return (
     <main className="min-h-screen bg-[#030305] text-[#f5f2ea] selection:bg-[#ff7b00] selection:text-black">
       <div className="fixed inset-0 z-0 bg-[#030305]">
-        {sceneReady && (
-          <Suspense fallback={null}>
-            <Scene {...SIMULATION} scrollProgress={scrollProgress} />
-          </Suspense>
-        )}
+        <Suspense fallback={null}>
+          <Scene {...SIMULATION} scrollProgress={scrollProgress} />
+        </Suspense>
       </div>
 
-      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_54%_36%,transparent_0,rgba(3,3,5,0.08)_28%,rgba(3,3,5,0.78)_82%)]" />
-      <div className="fixed inset-0 z-[1] pointer-events-none bg-[linear-gradient(90deg,rgba(3,3,5,0.9)_0%,rgba(3,3,5,0.42)_36%,rgba(3,3,5,0.18)_60%,rgba(3,3,5,0.76)_100%)]" />
+      {/* Scrims only where copy lives — keep the upper field clear for the face close-up */}
+      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(ellipse_90%_65%_at_20%_92%,rgba(3,3,5,0.94)_0%,rgba(3,3,5,0.42)_38%,transparent_68%)]" />
+      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(ellipse_55%_50%_at_50%_50%,rgba(3,3,5,0.55)_0%,transparent_70%)] md:opacity-0" />
       <div className="grain-overlay" />
 
       <div className="relative z-10">
