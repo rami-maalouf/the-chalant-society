@@ -131,7 +131,7 @@ export default function App() {
               you&apos;ve been trained to be nonchalant
             </h1>
             <p className="hero-subcopy">
-              the chalant society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
+              The Chalant Society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
             </p>
             <div className="cta-row">
               <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
@@ -319,7 +319,7 @@ export default function App() {
                 </a>
               </nav>
               <p className="site-footer-copy">
-                © {new Date().getFullYear()} the chalant society
+                © {new Date().getFullYear()} The Chalant Society
               </p>
             </div>
           </div>
