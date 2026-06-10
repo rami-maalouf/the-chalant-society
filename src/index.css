@@ -174,9 +174,9 @@ a {
 
 .section-hero {
   min-height: 100svh;
-  align-items: center;
+  align-items: flex-end;
   padding-top: var(--header-offset);
-  padding-bottom: var(--section-pad-lg);
+  padding-bottom: clamp(12vh, 16vh, 20vh);
   box-sizing: border-box;
 }
 
@@ -266,10 +266,10 @@ a {
   margin-bottom: 0;
 }
 
-.spoken-copy em {
+.chalant-word {
   font-family: var(--font-serif);
   font-style: italic;
-  font-weight: 800;
+  font-weight: var(--weight-display);
   color: #ffb000;
 }
 
@@ -432,7 +432,6 @@ a {
   font-weight: var(--weight-display);
   line-height: 0.95;
   letter-spacing: -0.02em;
-  text-transform: lowercase;
   transition: color 300ms ease;
 }
 

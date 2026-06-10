@@ -256,11 +256,9 @@ export function generateCrowdTextures(
   const targetPositions = new Float32Array(size * 4);
   const initialPositions = new Float32Array(size * 4);
 
-  const scannedCrowdSources =
-    options.scannedCrowdPositions?.filter(
-      (positions): positions is Float32Array => Boolean(positions?.length)
-    ) ?? [];
-  const fallbackSource = scannedCrowdSources[0] ?? null;
+  const crowdSlots = options.scannedCrowdPositions ?? [];
+  const fallbackSource =
+    crowdSlots.find((positions): positions is Float32Array => Boolean(positions?.length)) ?? null;
 
   for (let figIdx = 0; figIdx < CROWD_LAYOUTS.length; figIdx++) {
     const layout = CROWD_LAYOUTS[figIdx];
@@ -275,7 +273,7 @@ export function generateCrowdTextures(
     const crowdSource =
       figIdx === 0
         ? standoutPositions ?? fallbackSource
-        : scannedCrowdSources[(figIdx - 1) % scannedCrowdSources.length] ?? fallbackSource;
+        : crowdSlots[figIdx - 1] ?? fallbackSource;
 
     if (!crowdSource) {
       continue;

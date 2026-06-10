@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ArrowRight, Calendar, Instagram, Linkedin, Mail, MessageCircle, Youtube } from "lucide-react";
+import { ArrowRight, Calendar, Instagram, Linkedin, Mail, Youtube } from "lucide-react";
+import DiscordIcon from "./components/DiscordIcon";
 
 const Scene = lazy(() => import("./components/Scene"));
 
@@ -19,25 +20,25 @@ const SIMULATION = {
 
 const PILLARS = [
   {
-    name: "courage",
+    name: "Courage",
     tagline: "try in public",
     description:
       "show up before you feel ready. take the shot, ask the question, and let rejection land where it may.",
   },
   {
-    name: "charisma",
+    name: "Charisma",
     tagline: "presence that lands",
     description:
       "warmth without performance. make people feel seen without shrinking yourself to stay safe.",
   },
   {
-    name: "care",
+    name: "Care",
     tagline: "show the care",
     description:
       "we're not afraid to show that we care—on this site, in the discord, in how we debrief. no ironic distance, just honest investment.",
   },
   {
-    name: "curiosity",
+    name: "Curiosity",
     tagline: "stay open",
     description:
       "ask what you actually want to know. trade rehearsed indifference for genuine wonder.",
@@ -109,7 +110,7 @@ export default function App() {
       <div className="relative z-10">
         <header className="site-header">
           <a className="site-mark" href="#top" aria-label="The Chalant Society home">
-            The Chalant Society
+            The <em className="chalant-word">Chalant</em> Society
           </a>
           <nav className="hidden items-center gap-8 md:flex">
             <a className="nav-link" href="#in-action">in action</a>
@@ -118,7 +119,7 @@ export default function App() {
           </nav>
           <div className="flex items-center gap-4">
             <a className="header-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
-              <MessageCircle size={13} />
+              <DiscordIcon size={13} />
               <span>Join Discord</span>
             </a>
           </div>
@@ -128,14 +129,14 @@ export default function App() {
           <div className="page-container">
             {/* <p className="eyebrow">courage · charisma · care · curiosity</p> */}
             <h1 className="hero-title">
-              you&apos;ve been trained to be nonchalant
+              You&apos;ve been trained to be nonchalant
             </h1>
             <p className="hero-subcopy">
-              The Chalant Society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
+              The <em className="chalant-word">Chalant</em> Society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
             </p>
             <div className="cta-row">
               <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
-                <MessageCircle size={18} />
+                <DiscordIcon size={18} />
                 join the discord
                 <ArrowRight size={18} />
               </a>
@@ -150,7 +151,7 @@ export default function App() {
           <div className="page-container statement-block">
             {/* <p className="section-kicker">the manifesto</p> */}
             <h2>
-              apathy is an armor
+              Apathy is an armor.
               <br />
               it is also a cage
             </h2>
@@ -158,29 +159,31 @@ export default function App() {
               <p>say less. want less. risk less.</p>
               <p>pretend you did not care, so rejection has nowhere to land.</p>
               <p>we call it being cool. we call it being calm. but it is just rehearsed fear.</p>
-              <p>being <em>chalant</em> is the cure. it means caring on purpose, trying in public, taking up space, and showing up with absolute presence.</p>
+              <p>being <em className="chalant-word">chalant</em> is the cure. it means caring on purpose, trying in public, taking up space, and showing up with absolute presence.</p>
             </div>
           </div>
         </section>
 
         <section id="community" className="section-frame section-content">
           <div className="page-container">
-            <h2 className="section-title-large">two ways to practice being chalant</h2>
+            <h2 className="section-title-large">
+              Two ways to practice being <em className="chalant-word">chalant</em>
+            </h2>
 
             <div className="offerings-grid">
               <div className="offering-card">
                 <div className="card-content">
-                  <h3>the weekly challenges & discord</h3>
+                  <h3>The weekly challenges & discord</h3>
                   <p>
                     step outside your comfort zone as a team. we organize weekly, filmed group challenges (inspired by rejection therapy) to shatter social anxiety and build presence in public spaces.
                   </p>
                   <p>
-                    our discord is the 24/7 clubhouse where being chalant is the norm. share your wins, find accountability, and join a crew of courage-builders.
+                    our discord is the 24/7 clubhouse where being <em className="chalant-word">chalant</em> is the norm. share your wins, find accountability, and join a crew of courage-builders.
                   </p>
                 </div>
                 <div className="card-actions">
                   <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
-                    <MessageCircle size={18} />
+                    <DiscordIcon size={18} />
                     enter the discord
                     <ArrowRight size={18} />
                   </a>
@@ -193,7 +196,7 @@ export default function App() {
 
               <div id="coaching" className="offering-card">
                 <div className="card-content">
-                  <h3>tailored systems & expansion coaching</h3>
+                  <h3>Tailored systems & expansion coaching</h3>
                   <p>
                     stop holding yourself back. i work 1-on-1 with select individuals to design custom systems for communication, focus, and time management—grounded in real-world experiments.
                   </p>
@@ -220,7 +223,7 @@ export default function App() {
         <section id="pillars" className="section-frame section-content">
           <div className="page-container">
             <p className="section-kicker">what we practice</p>
-            <h2 className="section-title-large">the four c&apos;s</h2>
+            <h2 className="section-title-large">The four c&apos;s</h2>
             <p className="pillars-intro">
               nonchalance is the default. these are the muscles we train together—on camera, in discord, and out in the world.
             </p>
@@ -241,9 +244,9 @@ export default function App() {
           <div className="page-container chalant-act">
             <div className="chalant-act-header">
               <p className="section-kicker">see it in action</p>
-              <h2 className="section-title-large">from hesitation to action</h2>
+              <h2 className="section-title-large">From hesitation to action</h2>
               <p className="chalant-act-intro">
-                the story behind a real chalant act—and what it took to show up anyway.
+                the story behind a real <em className="chalant-word">chalant</em> act—and what it took to show up anyway.
               </p>
             </div>
             <div className="video-embed">
@@ -262,13 +265,15 @@ export default function App() {
         <section id="show-up" className="section-frame section-closer">
           <div className="page-container invitation">
             {/* <p className="section-kicker">the invitation</p> */}
-            <h2>are you chalant enough to show up?</h2>
+            <h2>
+              Are you <em className="chalant-word">chalant</em> enough to show up?
+            </h2>
             <p>
               you do not need to become fearless. you just need one room where effort is celebrated, and a group of people willing to go first.
             </p>
             <div className="cta-row">
               <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
-                <MessageCircle size={18} />
+                <DiscordIcon size={18} />
                 join the community
                 <ArrowRight size={18} />
               </a>
@@ -284,7 +289,7 @@ export default function App() {
           <div className="page-container site-footer-inner">
             <div className="site-footer-top">
               <a className="site-mark" href="#top">
-                The Chalant Society
+                The <em className="chalant-word">Chalant</em> Society
               </a>
               <nav className="site-footer-links" aria-label="Connect">
                 <a href={FOOTER_LINKS.instagram} target="_blank" rel="noreferrer">
@@ -300,7 +305,7 @@ export default function App() {
                   email
                 </a>
                 <a href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
-                  <MessageCircle size={16} aria-hidden />
+                  <DiscordIcon size={16} />
                   discord
                 </a>
                 <a href={FOOTER_LINKS.youtube} target="_blank" rel="noreferrer">
@@ -319,7 +324,7 @@ export default function App() {
                 </a>
               </nav>
               <p className="site-footer-copy">
-                © {new Date().getFullYear()} The Chalant Society
+                © {new Date().getFullYear()} The <em className="chalant-word">Chalant</em> Society
               </p>
             </div>
           </div>

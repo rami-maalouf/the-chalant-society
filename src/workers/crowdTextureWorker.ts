@@ -1,3 +1,4 @@
+import { CROWD_SLOT_ASSETS, POSED_CROWD_ASSETS } from "../utils/crowdAssets";
 import { densifyStandoutHead, generateCrowdTextures } from "../utils/proceduralHuman";
 
 interface CrowdTextureWorkerRequest {
@@ -7,15 +8,6 @@ interface CrowdTextureWorkerRequest {
 }
 
 const ASSET_ID = "rp_posedplus_00068_18";
-const CROWD_ASSET_IDS = [
-  "rp_carla_rigged_001_yup_a",
-  "rp_claudia_rigged_002_yup_a",
-  "rp_dennis_posed_004_30k",
-  "rp_eric_rigged_001_yup_a",
-  "rp_fabienne_percy_posed_001_60k",
-  "rp_mei_posed_001_30k",
-  "rp_posed_00178_29",
-];
 
 function getRenderPeopleAssetPaths(meshVariant: string) {
   const variant = meshVariant === "300k" ? "300k" : "100k";
@@ -52,16 +44,22 @@ workerScope.onmessage = async (event: MessageEvent<CrowdTextureWorkerRequest>) =
   const standoutParticleCount = width * 128;
   const crowdFigureParticleCount = width * 64;
   const { positionPath, colorPath } = getRenderPeopleAssetPaths(renderPeopleMesh);
-  const crowdPositionPromises = CROWD_ASSET_IDS.map((assetId) =>
-    loadFloatAsset(`/private-assets/renderpeople-crowd/${assetId}.bin`, crowdFigureParticleCount * 3)
+  const crowdLoads = await Promise.all(
+    POSED_CROWD_ASSETS.map(async (assetId) => [
+      assetId,
+      await loadFloatAsset(
+        `/private-assets/renderpeople-crowd/${assetId}.bin`,
+        crowdFigureParticleCount * 3
+      ),
+    ] as const)
   );
-  const [standoutPositions, particleColors, ...crowdPositions] = await Promise.all([
+  const crowdAssetMap = new Map<string, Float32Array | null>(crowdLoads);
+  const [standoutPositions, particleColors] = await Promise.all([
     loadFloatAsset(positionPath, standoutParticleCount * 3),
     loadFloatAsset(colorPath, standoutParticleCount * 3),
-    ...crowdPositionPromises,
   ]);
-  const scannedCrowdPositions = crowdPositions.filter(
-    (positions): positions is Float32Array => Boolean(positions)
+  const scannedCrowdPositions = CROWD_SLOT_ASSETS.map(
+    (assetId) => crowdAssetMap.get(assetId) ?? null
   );
   const standoutForScene = standoutPositions
     ? densifyStandoutHead(standoutPositions, particleColors, standoutParticleCount)
