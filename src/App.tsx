@@ -55,7 +55,7 @@ const FOOTER_LINKS = {
   instagram: "https://www.instagram.com/thechalantsociety/",
   linkedin: "https://www.linkedin.com/in/rami-m",
   email: "chalant@ramimaalouf.com",
-  discord: "https://discord.gg/chalant",
+  discord: "https://discord.gg/wJJS9nqs7E",
   youtube: FEATURED_ACT.youtubeUrl,
   coaching: "https://cal.com/rami-maalouf/chalant-discovery",
 } as const;
@@ -118,7 +118,7 @@ export default function App() {
             <a className="nav-link" href="#coaching">1-on-1 coaching</a>
           </nav>
           <div className="flex items-center gap-4">
-            <a className="header-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
+            <a className="header-cta" href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
               <DiscordIcon size={13} />
               <span>Join Discord</span>
             </a>
@@ -129,13 +129,15 @@ export default function App() {
           <div className="page-container">
             {/* <p className="eyebrow">courage · charisma · care · curiosity</p> */}
             <h1 className="hero-title">
-              You&apos;ve been trained to be nonchalant
+              You&apos;ve been trained
+              <br />
+              to be nonchalant
             </h1>
             <p className="hero-subcopy">
               The <em className="chalant-word">Chalant</em> Society is a community for social courage. we run weekly rejection-therapy challenges in the real world, then debrief and hold each other accountable on discord, so you are no longer held back by your irrational social fears.
             </p>
             <div className="cta-row">
-              <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
+              <a className="primary-cta" href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
                 <DiscordIcon size={18} />
                 join the discord
                 <ArrowRight size={18} />
@@ -182,7 +184,7 @@ export default function App() {
                   </p>
                 </div>
                 <div className="card-actions">
-                  <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
+                  <a className="primary-cta" href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
                     <DiscordIcon size={18} />
                     enter the discord
                     <ArrowRight size={18} />
@@ -196,12 +198,12 @@ export default function App() {
 
               <div id="coaching" className="offering-card">
                 <div className="card-content">
-                  <h3>Tailored systems & expansion coaching</h3>
+                  <h3>one-on-one coaching for real social fear</h3>
                   <p>
-                    stop holding yourself back. i work 1-on-1 with select individuals to design custom systems for communication, focus, and time management—grounded in real-world experiments.
+                    work with rami on the specific fears holding you back: freezing in meetings, dodging networking, staying quiet when you should speak up. each session is built around your goals, not a generic script.
                   </p>
                   <p>
-                    together, we run personalized comfort-zone expansions to take your social leadership, charisma, and clarity to the next level.
+                    we pair coaching with real social challenges that expand your comfort zone in controlled, supportive ways. debrief what happened, track your wins between sessions, and practice until acting with conviction feels normal.
                   </p>
                 </div>
                 <div className="card-actions">
@@ -272,7 +274,7 @@ export default function App() {
               you do not need to become fearless. you just need one room where effort is celebrated, and a group of people willing to go first.
             </p>
             <div className="cta-row">
-              <a className="primary-cta" href="https://discord.gg/chalant" target="_blank" rel="noreferrer">
+              <a className="primary-cta" href={FOOTER_LINKS.discord} target="_blank" rel="noreferrer">
                 <DiscordIcon size={18} />
                 join the community
                 <ArrowRight size={18} />

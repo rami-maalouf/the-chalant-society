@@ -194,6 +194,10 @@ a {
   max-width: var(--page-width);
 }
 
+.section-hero .page-container {
+  container-type: inline-size;
+}
+
 .eyebrow,
 .section-kicker {
   margin: 0 0 var(--stack-sm);
@@ -217,9 +221,11 @@ a {
 }
 
 .hero-title {
-  font-size: clamp(2.75rem, 7.5vw, 6.25rem);
+  width: 100%;
   max-width: 100%;
   margin: 0 0 var(--stack-md);
+  font-size: clamp(1.875rem, 8.75cqi, 5.25rem);
+  text-wrap: balance;
 }
 
 .hero-subcopy {
@@ -615,10 +621,6 @@ a {
     --section-pad: 4.75rem;
     --section-pad-lg: 5.5rem;
     --stack-xl: 2.25rem;
-  }
-
-  .hero-title {
-    font-size: clamp(2.75rem, 12vw, 4.5rem);
   }
 
   .hero-subcopy,
