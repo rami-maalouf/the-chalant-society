@@ -57,7 +57,7 @@ const FOOTER_LINKS = {
   email: "chalant@ramimaalouf.com",
   discord: "https://discord.gg/wJJS9nqs7E",
   youtube: FEATURED_ACT.youtubeUrl,
-  coaching: "https://cal.com/rami-maalouf/chalant-discovery",
+  coaching: "https://cal.com/rami-maalouf/chalant",
 } as const;
 
 function useScrollProgress() {
@@ -207,7 +207,7 @@ export default function App() {
                   </p>
                 </div>
                 <div className="card-actions">
-                  <a className="primary-cta" href="https://cal.com/rami-maalouf/chalant-discovery" target="_blank" rel="noreferrer">
+                  <a className="primary-cta" href={FOOTER_LINKS.coaching} target="_blank" rel="noreferrer">
                     <Calendar size={18} />
                     schedule a call
                     <ArrowRight size={18} />
