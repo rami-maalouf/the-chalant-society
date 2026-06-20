@@ -21,27 +21,27 @@ const SIMULATION = {
 const PILLARS = [
   {
     name: "Courage",
-    tagline: "try in public",
+    tagline: "do it anyway",
     description:
-      "show up before you feel ready. take the shot, ask the question, and let rejection land where it may.",
+      "you won't feel ready first. you pick a small scary thing, do it in public, survive it, and debrief with people who aren't going to make fun of you for trying.",
   },
   {
     name: "Charisma",
-    tagline: "presence that lands",
+    tagline: "show up for real",
     description:
-      "warmth without performance. make people feel seen without shrinking yourself to stay safe.",
+      "not a bit. you listen, you say what you actually think, and you stop making yourself smaller so no one can reject the real version of you.",
   },
   {
     name: "Care",
-    tagline: "show the care",
+    tagline: "say you care",
     description:
-      "we're not afraid to show that we care—on this site, in the discord, in how we debrief. no ironic distance, just honest investment.",
+      "wanting things isn't embarrassing in here. we talk about what we're building, we hype each other's wins, and nobody has to act like they're above it.",
   },
   {
     name: "Curiosity",
-    tagline: "stay open",
+    tagline: "stay interested",
     description:
-      "ask what you actually want to know. trade rehearsed indifference for genuine wonder.",
+      "a lot of social fear is just playing too cool to ask. here you're allowed to want to know—the weird question is usually the right one.",
   },
 ] as const;
 
