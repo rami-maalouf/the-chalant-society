@@ -15,30 +15,40 @@ The site uses a fixed WebGL particle-crowd background as the central metaphor: o
 - @react-three/postprocessing
 - Tailwind CSS
 
+## Pages
+
+- `/` (`index.html`, `src/App.tsx`): the home page with the WebGL crowd
+- `/merch` (`merch.html`, `src/merch/`): the waitlist for the first shirt. It loads no Three.js, so it stays fast on phones
+- `api/merch-waitlist.ts`: a Vercel edge function that saves a sign-up to the "Chalant Merch Waitlist" Notion database
+
+The developer brief for this work is `docs/revamp-and-merch-waitlist.md`.
+
 ## Requirements
 
-- Node.js 20 or newer
-- A browser with WebGL 2 support and floating-point or half-float color buffer render targets
+- [Bun](https://bun.sh)
+- A browser with WebGL 2 support and floating-point or half-float color buffer render targets (home page only)
 
-No API key or backend service is required.
+## Environment
+
+Copy `.env.example` to `.env.local` and fill in `NOTION_API_KEY`. The same two variables are set in the Vercel project.
 
 ## Run Locally
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
-The Vite server defaults to port 3000. If that port is busy, Vite will choose the next available port.
+The dev server runs on port 3000. It serves `/merch` and runs the files in `api/` the same way Vercel does, so the waitlist form works locally against the real Notion database.
 
 ## Scripts
 
 ```bash
-npm run dev      # Start the development server
-npm run build    # Build the production bundle
-npm run preview  # Preview the production build locally
-npm run lint     # Run TypeScript without emitting files
-npm run clean    # Remove generated build/server artifacts
+bun run dev      # start the development server
+bun run build    # build the production bundle
+bun run preview  # preview the production build locally (no api routes)
+bun run lint     # run typescript without emitting files
+bun run clean    # remove generated build artifacts
 ```
 
 ## Project Structure

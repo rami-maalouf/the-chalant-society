@@ -1,0 +1,904 @@
+/* /merch: the page is the white shirt */
+
+:root {
+  --cotton: #fbfbf9;
+  --cotton-deep: #f2f0ea;
+  --ink: #121110;
+  --ink-soft: #57544d;
+  --ink-faint: #8b877d;
+  --seam: #dcd8cf;
+  --amber: #ffb000;
+  --amber-ink: #a35200; /* amber that passes contrast on cotton */
+  --danger: #b3261e;
+
+  --font-block: "Bricolage Grotesque", "Arial Narrow", sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", sans-serif;
+  --font-serif: "Crimson Pro", Georgia, serif;
+  --font-hand: "Permanent Marker", "Marker Felt", cursive;
+
+  --gutter: clamp(1.25rem, 5vw, 2.5rem);
+  --column: min(34rem, calc(100vw - 2 * var(--gutter)));
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--cotton);
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3,
+.why-line,
+.success-title,
+.debate-prompt {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* cotton: a faint weave and a little grain, so the page reads as fabric, not paper */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.07 0 0 0 0 0.06 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(18, 17, 16, 0.018) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(18, 17, 16, 0.014) 0 1px, transparent 1px 3px);
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hand {
+  font-family: var(--font-hand);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.merch {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.merch main {
+  flex: 1;
+}
+
+/* header */
+
+.merch-header,
+.merch-footer {
+  width: var(--column);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.merch-header {
+  padding: max(1.25rem, env(safe-area-inset-top)) 0 0;
+}
+
+.merch-logo {
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.merch-logo em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.12em;
+  color: var(--amber-ink);
+}
+
+.merch-tag {
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  transform: rotate(-4deg);
+}
+
+/* the debate: the two halves of the headline are the buttons */
+
+.debate {
+  width: var(--column);
+  margin: 0 auto;
+  padding: clamp(2.5rem, 9vh, 5.5rem) 0 1.5rem;
+  text-align: center;
+}
+
+.debate-kicker {
+  margin: 0 0 1.4rem;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  transform: rotate(-3deg);
+}
+
+.debate-board {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+}
+
+.debate-line {
+  width: 4px;
+  margin: -0.6rem 0;
+  border-radius: 4px;
+  background: var(--ink);
+  /* a marker line is never perfectly straight */
+  transform: rotate(0.6deg);
+}
+
+.side {
+  appearance: none;
+  position: relative;
+  min-height: 9.5rem;
+  margin: 0;
+  padding: 1.25rem 0.35rem 2.6rem;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 200ms ease,
+    opacity 300ms ease;
+}
+
+.side:active {
+  transform: translateY(1px);
+}
+
+.side-chalant {
+  padding-right: clamp(0.6rem, 3vw, 2rem);
+  text-align: right;
+}
+
+.side-nonchalant {
+  padding-left: clamp(0.6rem, 3vw, 2rem);
+  text-align: left;
+}
+
+.side.is-other {
+  opacity: 0.38;
+}
+
+.side-word {
+  position: relative;
+  isolation: isolate; /* keeps the highlighter above the button background */
+  display: inline-block;
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variation-settings: "wdth" 75, "opsz" 96;
+  font-size: clamp(2.05rem, 9.4vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+}
+
+/* the amber highlighter swipe behind the picked word */
+.side-highlight {
+  position: absolute;
+  z-index: -1;
+  left: -0.12em;
+  right: -0.12em;
+  top: 52%;
+  height: 0.5em;
+  border-radius: 0.12em 0.3em 0.18em 0.32em;
+  background: var(--amber);
+  opacity: 0.85;
+  transform: scaleX(0) rotate(-1.5deg);
+  transform-origin: left center;
+  transition: transform 420ms var(--ease-out);
+}
+
+.side.is-picked .side-highlight {
+  transform: scaleX(1) rotate(-1.5deg);
+}
+
+/* the signature, drawn under the picked word */
+.side-scribble {
+  position: absolute;
+  bottom: 0.7rem;
+  width: min(72%, 15rem);
+  height: 1.9rem;
+  overflow: visible;
+}
+
+.side-chalant .side-scribble {
+  right: clamp(0.6rem, 3vw, 2rem);
+}
+
+.side-nonchalant .side-scribble {
+  left: clamp(0.6rem, 3vw, 2rem);
+}
+
+.side-scribble path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 640ms var(--ease-out) 160ms,
+    opacity 1ms linear 160ms;
+}
+
+.side.is-picked .side-scribble path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.debate-prompt {
+  min-height: 3.2em;
+  margin: 1.4rem auto 0;
+  max-width: 22rem;
+  font-size: clamp(1.15rem, 4.6vw, 1.45rem);
+  line-height: 1.35;
+  transform: rotate(-1.5deg);
+}
+
+/* the form */
+
+.signup-slot {
+  width: var(--column);
+  margin: 0 auto;
+  scroll-margin-bottom: 1.5rem;
+}
+
+.signup-locked {
+  margin: 0 0 1rem;
+  padding: 1.1rem 1rem;
+  border: 2px dashed var(--seam);
+  border-radius: 16px;
+  color: var(--ink-faint);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.signup {
+  position: relative;
+  padding: 1.6rem 1.35rem 1.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 6px 6px 0 var(--ink);
+  animation: slide-in 520ms var(--ease-out) both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.signup-title {
+  margin: 0 0 1.35rem;
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 85, "opsz" 48;
+  font-size: clamp(1.45rem, 6vw, 1.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.signup-form {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field-label {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.field-input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.7rem 0.95rem;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--cotton);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.0625rem; /* 17px: stops ios from zooming in on focus */
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.field-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.field-input:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--amber);
+}
+
+.field-input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.95rem;
+}
+
+.form-error a {
+  color: inherit;
+}
+
+.sizes {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.sizes.is-shaking {
+  animation: shake 380ms ease both;
+}
+
+@keyframes shake {
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+.size {
+  appearance: none;
+  min-height: 3rem;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--cotton);
+  color: var(--ink);
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-size: 0.98rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.size.is-picked {
+  background: var(--ink);
+  color: var(--cotton);
+  transform: translateY(-2px);
+}
+
+.sizes[aria-invalid="true"] .size {
+  border-color: var(--danger);
+}
+
+.submit {
+  appearance: none;
+  width: 100%;
+  min-height: 3.6rem;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: var(--ink);
+  color: var(--cotton);
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-size: 1.12rem;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
+}
+
+.submit:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* success */
+
+.success-title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.75rem, 7.6vw, 2.4rem);
+  line-height: 1.1;
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+
+.success-title:focus {
+  outline: none;
+}
+
+.success-note {
+  margin: 0 0 1.4rem;
+  color: var(--ink-soft);
+}
+
+.success-share {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.1rem 0 1.2rem;
+  border-top: 2px dashed var(--seam);
+}
+
+.success-share p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.success-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.success-links a {
+  white-space: nowrap;
+}
+
+/* how it works */
+
+.section-title {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 80, "opsz" 72;
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.how,
+.why,
+.faq {
+  width: var(--column);
+  margin: 0 auto;
+}
+
+.how {
+  padding: clamp(4.5rem, 12vh, 7rem) 0 1rem;
+}
+
+.how-shirts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin: 0 -0.4rem 1.8rem;
+}
+
+.how-shirts figure {
+  margin: 0;
+  text-align: center;
+}
+
+.how-shirts figcaption {
+  margin-top: 0.2rem;
+  color: var(--ink-faint);
+  font-size: 0.95rem;
+}
+
+.tee {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.tee-body {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.tee-seam,
+.tee-cord {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  opacity: 0.45;
+}
+
+.tee-word {
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75, "opsz" 24;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  fill: var(--ink);
+}
+
+.tee-word-small {
+  font-size: 11px;
+}
+
+.tee-divider {
+  stroke: var(--ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.tee-hand {
+  font-family: var(--font-hand);
+  font-size: 13px;
+  fill: var(--ink);
+}
+
+.tee-handle {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 7.5px;
+  fill: var(--ink-soft);
+}
+
+.tee-loop {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.tee-marker {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.tee-marker-cap {
+  fill: var(--ink);
+}
+
+.tee-signature {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 700ms var(--ease-out),
+    opacity 1ms linear;
+}
+
+.tee-back.is-signed .tee-signature {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.tee-you {
+  font-family: var(--font-hand);
+  font-size: 14px;
+  fill: var(--amber-ink);
+  opacity: 0;
+  transition: opacity 500ms ease 1100ms;
+}
+
+.tee-back.is-signed .tee-you {
+  opacity: 1;
+}
+
+.how-steps {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.how-steps li {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.how-steps p {
+  margin: 0.2rem 0 0;
+  font-size: 1.12rem;
+}
+
+.step-num {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 2.5px solid var(--ink);
+  border-radius: 50% 46% 52% 48%;
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  transform: rotate(-6deg);
+}
+
+.quote {
+  font-family: var(--font-hand);
+  white-space: nowrap;
+}
+
+/* why */
+
+.why {
+  padding: clamp(3.5rem, 9vh, 5.5rem) 0 clamp(4rem, 10vh, 6rem);
+}
+
+.why-line {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 6.2vw, 2.1rem);
+  line-height: 1.22;
+  color: var(--ink-soft);
+}
+
+.why-lead {
+  margin-bottom: 0.9rem;
+  font-family: var(--font-block);
+  font-style: normal;
+  font-weight: 800;
+  font-variation-settings: "wdth" 80, "opsz" 72;
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.why-lead em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--amber-ink);
+}
+
+.why-last {
+  margin-top: 0.9rem;
+  color: var(--ink);
+}
+
+/* faq */
+
+.faq {
+  padding: 0 0 clamp(4rem, 10vh, 6rem);
+}
+
+.faq details {
+  border-top: 2px solid var(--ink);
+}
+
+.faq details:last-of-type {
+  border-bottom: 2px solid var(--ink);
+}
+
+.faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.6rem;
+  padding: 0.8rem 0;
+  font-weight: 600;
+  font-size: 1.08rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary::after {
+  content: "+";
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform 200ms ease;
+}
+
+.faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq details p {
+  margin: 0 0 1.1rem;
+  color: var(--ink-soft);
+}
+
+/* footer */
+
+.merch-footer {
+  flex-wrap: wrap;
+  padding: 1.6rem 0 max(1.8rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--seam);
+}
+
+.merch-footer nav {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.95rem;
+}
+
+.merch-footer nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+/* hover styles only where a real pointer hovers. on phones a tap would leave them stuck */
+@media (hover: hover) {
+  a:hover {
+    color: var(--amber-ink);
+  }
+
+  .side:hover {
+    background: var(--cotton-deep);
+  }
+
+  .side.is-other:hover {
+    opacity: 0.7;
+  }
+
+  .size:hover {
+    background: var(--cotton-deep);
+  }
+
+  .submit:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--amber);
+  }
+
+  .merch-footer nav a:hover {
+    color: var(--ink);
+  }
+}
+
+/* wider screens: more air, same column */
+
+@media (min-width: 760px) {
+  :root {
+    --column: min(46rem, calc(100vw - 2 * var(--gutter)));
+  }
+
+  .side {
+    min-height: 12rem;
+  }
+
+  .signup {
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 2rem 1.9rem 1.8rem;
+  }
+
+  .signup-locked {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  .how-shirts {
+    gap: 2rem;
+    margin-inline: 0;
+  }
+
+  .how-steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+  }
+
+  .how-steps li {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}
