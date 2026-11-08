@@ -106,10 +106,13 @@ function buildGeometry(): THREE.PlaneGeometry {
       }
     }
   }
-  // keep the true distance right at the edge, so the outline still closes cleanly
+  // close the edge: front and back come down to exactly zero a few pixels before the outline,
+  // so along the outline the two surfaces touch and the shirt is sealed, with no slit between them.
+  // the band is wider than one grid cell, so no triangle at the edge can lift off zero
+  const SEAM = 4;
   for (let i = 0; i < mw * mh; i++) {
     if (!inside[i]) dist[i] = 0;
-    else if (raw[i] < 6) dist[i] = Math.min(dist[i], raw[i] * 1.6);
+    else dist[i] = Math.min(dist[i], Math.max(0, raw[i] - SEAM) * 1.8);
   }
 
   const segX = 150;
