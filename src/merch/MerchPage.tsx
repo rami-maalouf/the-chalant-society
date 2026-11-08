@@ -86,26 +86,6 @@ export default function MerchPage() {
           )}
         </div>
 
-        <section className="how" aria-labelledby="how-title">
-          <h2 id="how-title" className="section-title">how the shirt works</h2>
-          <ol className="how-steps">
-            <li>
-              <span className="step-num" aria-hidden>1</span>
-              <p>wear it.</p>
-            </li>
-            <li>
-              <span className="step-num" aria-hidden>2</span>
-              <p>
-                ask a stranger: <span className="quote">"wanna settle a debate?"</span>
-              </p>
-            </li>
-            <li>
-              <span className="step-num" aria-hidden>3</span>
-              <p>they sign your back. you just had a conversation you weren't going to have.</p>
-            </li>
-          </ol>
-        </section>
-
         <section className="why" aria-labelledby="why-title">
           <h2 id="why-title" className="visually-hidden">why this shirt exists</h2>
           <p className="why-line why-lead">
@@ -121,10 +101,6 @@ export default function MerchPage() {
           <details>
             <summary>when does it drop?</summary>
             <p>when the first batch is printed. the list hears first.</p>
-          </details>
-          <details>
-            <summary>what if nobody signs it?</summary>
-            <p>then you still asked. that was the hard part.</p>
           </details>
           <details>
             <summary>what is the chalant society?</summary>

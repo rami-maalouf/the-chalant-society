@@ -597,7 +597,7 @@ a {
   white-space: nowrap;
 }
 
-/* how it works */
+/* sections below the form */
 
 .section-title {
   margin: 0 0 1.6rem;
@@ -609,15 +609,10 @@ a {
   letter-spacing: -0.025em;
 }
 
-.how,
 .why,
 .faq {
   width: var(--column);
   margin: 0 auto;
-}
-
-.how {
-  padding: clamp(4.5rem, 12vh, 7rem) 0 1rem;
 }
 
 .tee {
@@ -727,47 +722,10 @@ a {
   opacity: 1;
 }
 
-.how-steps {
-  display: grid;
-  gap: 1.1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.how-steps li {
-  display: grid;
-  grid-template-columns: 2.4rem 1fr;
-  align-items: start;
-  gap: 0.9rem;
-}
-
-.how-steps p {
-  margin: 0.2rem 0 0;
-  font-size: 1.12rem;
-}
-
-.step-num {
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border: 2.5px solid var(--ink);
-  border-radius: 50% 46% 52% 48%;
-  font-family: var(--font-hand);
-  font-size: 1.1rem;
-  transform: rotate(-6deg);
-}
-
-.quote {
-  font-family: var(--font-hand);
-  white-space: nowrap;
-}
-
 /* why */
 
 .why {
-  padding: clamp(3.5rem, 9vh, 5.5rem) 0 clamp(4rem, 10vh, 6rem);
+  padding: clamp(4.5rem, 12vh, 7rem) 0 clamp(4rem, 10vh, 6rem);
 }
 
 .why-line {
@@ -923,16 +881,6 @@ a {
   .signup-locked {
     max-width: 30rem;
     margin-inline: auto;
-  }
-
-  .how-steps {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.6rem;
-  }
-
-  .how-steps li {
-    grid-template-columns: 1fr;
-    align-content: start;
   }
 }
 

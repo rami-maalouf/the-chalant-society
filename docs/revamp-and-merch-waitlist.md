@@ -167,13 +167,7 @@ All copy below is a **draft**. Rami approves the final words.
 - A button that uses the Web Share API, with a "copy link" fallback. The shared link is `https://chalant.orbitlabs.studio/merch?ref=friend`.
 - Secondary links: Discord (`https://discord.gg/wJJS9nqs7E`) and Instagram (`https://www.instagram.com/thechalantsociety/`).
 
-**Section C: how the shirt works** (three short steps)
-
-1. wear it.
-2. ask a stranger: "wanna settle a debate?"
-3. they sign your back. you just had a conversation you wouldn't have had.
-
-**No photos for now** (Rami's decision, 2026-11-08). Draw the shirt instead: a simple SVG of the front and the back, in the same style as the page (black lines on off-white, marker handwriting for the signatures). Section 10 shows the layout. The back drawing can fill with example signatures as the visitor scrolls. Build the image slot so a real photo can replace the drawing later with no layout change.
+**Section C: removed** (Rami's decision, 2026-11-08). The 3D shirt at the top already shows how the shirt works.
 
 **Section D: why** (one short paragraph, Rami writes it)
 
