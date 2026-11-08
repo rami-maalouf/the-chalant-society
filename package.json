@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "merch:sync": "bun --env-file=.env.local scripts/sync-merch-options.ts"
   },
   "dependencies": {
     "@notionhq/client": "^5.6.0",

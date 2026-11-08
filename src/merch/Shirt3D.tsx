@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import type { Side } from "./options";
-import { DESIGN_H, DESIGN_W, drawBack, drawFront, silhouettePath } from "./shirtArt";
+import { DESIGN_H, DESIGN_W, drawBack, drawFront, silhouettePath, type SideIndex, type Sides } from "./shirtArt";
 
 // world units: 1 unit = 100 design px
 const WORLD_W = DESIGN_W / 100;
@@ -9,10 +8,19 @@ const WORLD_H = DESIGN_H / 100;
 const TEX_SCALE = 4; // texture pixels per design px
 const DEPTH = 0.34; // how far the torso puffs out on each side
 
-type ShirtApi = {
-  setSide: (side: Side | null) => void;
+type ShowroomApi = {
+  setIndex: (index: number) => void;
+  setSides: (sides: (SideIndex | null)[]) => void;
   dispose: () => void;
 };
+
+// the slider: the active shirt in the middle, its neighbours smaller, turned in and tinted
+const SPACING = 2.25; // world units from the middle to a neighbour
+const SPACING_FAR = 1.4; // extra distance for shirts two or more away
+const PEEK = 0.8; // how much of a neighbour stays in frame on narrow screens
+const NEIGHBOUR_SCALE = 0.58;
+const TINT = new THREE.Color(0xe4e0d8);
+const WHITE = new THREE.Color(0xffffff);
 
 function makeCanvas(): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -177,7 +185,34 @@ function buildGeometry(): THREE.PlaneGeometry {
   return geometry;
 }
 
-function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: () => void): ShirtApi {
+type ShirtItem = {
+  sides: Sides;
+  seed: number;
+  group: THREE.Group;
+  materials: THREE.MeshPhysicalMaterial[];
+  textures: THREE.CanvasTexture[];
+  frontCanvas: HTMLCanvasElement;
+  backCanvas: HTMLCanvasElement;
+  backTexture: THREE.CanvasTexture;
+  hit: THREE.Mesh;
+  shadowMaterial: THREE.MeshBasicMaterial;
+  side: SideIndex | null;
+  signature: number; // 0..1, how much of the visitor's signature is drawn
+  signatureStart: number;
+  rot: number;
+  vel: number;
+  target: number;
+  backDirty: boolean;
+};
+
+function createShowroom(
+  container: HTMLElement,
+  shirts: Sides[],
+  startIndex: number,
+  reducedMotion: boolean,
+  onSelect: (index: number) => void,
+  onReady: () => void,
+): ShowroomApi {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
@@ -199,9 +234,6 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
   scene.add(rim);
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-
-  const frontCanvas = makeCanvas();
-  const backCanvas = makeCanvas();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const toTexture = (canvas: HTMLCanvasElement) => {
     const texture = new THREE.CanvasTexture(canvas);
@@ -209,9 +241,6 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
     texture.anisotropy = anisotropy;
     return texture;
   };
-  const frontTexture = toTexture(frontCanvas);
-  const backTexture = toTexture(backCanvas);
-
   const fabric = (map: THREE.Texture) =>
     new THREE.MeshPhysicalMaterial({
       map,
@@ -224,18 +253,10 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
       sheenColor: new THREE.Color(0xffffff),
     });
 
+  // shared by every shirt
   const geometry = buildGeometry();
-  const frontMaterial = fabric(frontTexture);
-  const backMaterial = fabric(backTexture);
-  const shirt = new THREE.Group();
-  const front = new THREE.Mesh(geometry, frontMaterial);
-  // the back is the same surface turned around, so its print reads the right way from behind
-  const back = new THREE.Mesh(geometry, backMaterial);
-  back.rotation.y = Math.PI;
-  shirt.add(front, back);
-  scene.add(shirt);
-
-  // a soft shadow on the floor under the shirt
+  const hitGeometry = new THREE.PlaneGeometry(2.6, 3.1);
+  const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
   const shadowCanvas = document.createElement("canvas");
   shadowCanvas.width = 256;
   shadowCanvas.height = 64;
@@ -246,29 +267,65 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
   sctx.fillStyle = gradient;
   sctx.fillRect(0, 0, 256, 64);
   const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.8, 0.7),
-    new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false }),
-  );
-  shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = -WORLD_H / 2 - 0.12;
-  scene.add(shadow);
+  const shadowGeometry = new THREE.PlaneGeometry(2.8, 0.7);
+
+  const items: ShirtItem[] = shirts.map((sides, index) => {
+    const frontCanvas = makeCanvas();
+    const backCanvas = makeCanvas();
+    const frontTexture = toTexture(frontCanvas);
+    const backTexture = toTexture(backCanvas);
+    const frontMaterial = fabric(frontTexture);
+    const backMaterial = fabric(backTexture);
+    const group = new THREE.Group();
+    const front = new THREE.Mesh(geometry, frontMaterial);
+    // the back is the same surface turned around, so its print reads the right way from behind
+    const back = new THREE.Mesh(geometry, backMaterial);
+    back.rotation.y = Math.PI;
+    const hit = new THREE.Mesh(hitGeometry, hitMaterial);
+    hit.userData.index = index;
+    const shadowMaterial = new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false });
+    const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = -WORLD_H / 2 - 0.12;
+    group.add(front, back, hit);
+    scene.add(group, shadow);
+    group.userData.shadow = shadow;
+    return {
+      sides,
+      seed: index + 1,
+      group,
+      materials: [frontMaterial, backMaterial],
+      textures: [frontTexture, backTexture],
+      frontCanvas,
+      backCanvas,
+      backTexture,
+      hit,
+      shadowMaterial,
+      side: null,
+      signature: 0,
+      signatureStart: -1,
+      rot: 0,
+      vel: 0,
+      target: 0,
+      backDirty: false,
+    };
+  });
+  const hits = items.map((item) => item.hit);
 
   // state
-  let side: Side | null = null;
-  let signature = 0; // 0..1, how much of the visitor's signature is drawn
-  let signatureStart = -1;
-  let rot = 0;
-  let vel = 0;
-  let target = 0;
+  let active = startIndex;
+  let pos = startIndex; // the slider position, eases toward `active`
+  let posVel = 0;
   let dragging = false;
   let lastX = 0;
+  let downX = 0;
+  let downY = 0;
+  let downTarget = -1; // a neighbour the pointer went down on, so a tap can select it
   let sway = reducedMotion ? 0 : 1;
   let running = false;
   let visible = true;
   let frame = 0;
   let disposed = false;
-  let backDirty = false;
   let tick = 0;
 
   const resize = () => {
@@ -276,10 +333,11 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // fit the whole shirt, with room to turn
+    // fit the whole shirt, plus a peek of each neighbour when there is more than one shirt
     const fov = THREE.MathUtils.degToRad(camera.fov);
+    const frameW = WORLD_W + 0.3 + (items.length > 1 ? PEEK * 2 : 0);
     const fitH = (WORLD_H + 0.38) / (2 * Math.tan(fov / 2));
-    const fitW = (WORLD_W + 0.3) / (2 * Math.tan(fov / 2) * camera.aspect);
+    const fitW = frameW / (2 * Math.tan(fov / 2) * camera.aspect);
     camera.position.set(0, 0.1, Math.max(fitH, fitW));
     camera.lookAt(0, -0.05, 0);
     camera.updateProjectionMatrix();
@@ -294,30 +352,58 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
     const now = performance.now();
     const t = now / 1000;
 
-    if (!dragging) {
-      vel = (vel + (target - rot) * (reducedMotion ? 1 : 0.055)) * (reducedMotion ? 0 : 0.8);
-      rot = reducedMotion ? target : rot + vel;
+    // slide
+    if (reducedMotion) pos = active;
+    else {
+      posVel = (posVel + (active - pos) * 0.08) * 0.72;
+      pos += posVel;
     }
     sway += ((dragging || reducedMotion ? 0 : 1) - sway) * 0.05;
 
-    shirt.rotation.y = rot + Math.sin(t * 0.55) * 0.24 * sway;
-    shirt.rotation.x = Math.sin(t * 0.43) * 0.035 * sway;
-    shirt.position.y = Math.sin(t * 0.9) * 0.035 * sway;
-
-    // draw the visitor's signature once the back has turned toward the camera
-    if (side && signature < 1) {
-      const facingBack = Math.abs(rot - target) < 0.35;
-      if (facingBack && signatureStart < 0) signatureStart = now;
-      if (signatureStart >= 0) {
-        signature = reducedMotion ? 1 : Math.min(1, (now - signatureStart) / 900);
-        backDirty = true;
+    items.forEach((item, index) => {
+      if (!(dragging && index === active)) {
+        item.vel = (item.vel + (item.target - item.rot) * (reducedMotion ? 1 : 0.055)) * (reducedMotion ? 0 : 0.8);
+        item.rot = reducedMotion ? item.target : item.rot + item.vel;
       }
-    }
+
+      const rel = index - pos;
+      const a = Math.min(Math.abs(rel), 1);
+      const dir = Math.sign(rel);
+      const x = dir * (Math.abs(rel) <= 1 ? Math.abs(rel) * SPACING : SPACING + (Math.abs(rel) - 1) * SPACING_FAR);
+      const scale = 1 - (1 - NEIGHBOUR_SCALE) * a;
+      const focus = 1 - a; // only the middle shirt sways
+
+      const group = item.group;
+      group.visible = Math.abs(rel) < 1.9;
+      group.position.set(x, Math.sin(t * 0.9 + index) * 0.035 * sway * focus - (1 - scale) * 0.4, -0.9 * a);
+      group.scale.setScalar(scale);
+      group.rotation.y = item.rot + Math.sin(t * 0.55) * 0.24 * sway * focus - dir * 0.5 * a;
+      group.rotation.x = Math.sin(t * 0.43) * 0.035 * sway * focus;
+      const shadow = group.userData.shadow as THREE.Mesh;
+      shadow.visible = group.visible;
+      shadow.position.set(x, -WORLD_H / 2 * scale - 0.12 - (1 - scale) * 0.4, -0.9 * a);
+      shadow.scale.setScalar(scale);
+      item.shadowMaterial.opacity = 1 - a * 0.6;
+      for (const material of item.materials) material.color.copy(WHITE).lerp(TINT, a);
+
+      // draw the visitor's signature once the back has turned toward the camera
+      if (item.side !== null && item.signature < 1) {
+        const facingBack = Math.abs(item.rot - item.target) < 0.35;
+        if (facingBack && item.signatureStart < 0) item.signatureStart = now;
+        if (item.signatureStart >= 0) {
+          item.signature = reducedMotion ? 1 : Math.min(1, (now - item.signatureStart) / 900);
+          item.backDirty = true;
+        }
+      }
+    });
+
     tick++;
-    if (backDirty && (tick % 2 === 0 || signature >= 1)) {
-      drawBack(backCanvas, side, signature);
-      backTexture.needsUpdate = true;
-      backDirty = false;
+    for (const item of items) {
+      if (item.backDirty && (tick % 2 === 0 || item.signature >= 1)) {
+        drawBack(item.backCanvas, item.sides, item.seed, item.side, item.signature);
+        item.backTexture.needsUpdate = true;
+        item.backDirty = false;
+      }
     }
 
     renderer.render(scene, camera);
@@ -335,33 +421,71 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
   };
   const updateRunning = () => (visible && document.visibilityState === "visible" ? start() : stop());
 
-  // drag to turn. vertical swipes still scroll the page (touch-action: pan-y in css)
+  // which shirt is under the pointer, if any
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const shirtAt = (event: PointerEvent): number => {
+    const rect = canvas.getBoundingClientRect();
+    pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(hits.filter((mesh) => mesh.parent?.visible), false)[0];
+    return hit ? (hit.object.userData.index as number) : -1;
+  };
+
+  // drag the middle shirt to turn it. tap a neighbour to slide it to the middle.
+  // vertical swipes still scroll the page (touch-action: pan-y in css)
   const canvas = renderer.domElement;
   const onDown = (event: PointerEvent) => {
+    downX = event.clientX;
+    downY = event.clientY;
+    const under = shirtAt(event);
+    downTarget = under !== -1 && under !== active ? under : -1;
+    if (downTarget !== -1) return;
     dragging = true;
     lastX = event.clientX;
-    vel = 0;
+    items[active].vel = 0;
     canvas.setPointerCapture(event.pointerId);
   };
   const onMove = (event: PointerEvent) => {
-    if (!dragging) return;
+    if (!dragging) {
+      if (event.pointerType === "mouse") {
+        const under = shirtAt(event);
+        canvas.style.cursor = under !== -1 && under !== active ? "pointer" : "";
+      }
+      return;
+    }
+    const item = items[active];
     const delta = (event.clientX - lastX) * 0.011;
     lastX = event.clientX;
-    rot += delta;
-    vel = delta;
+    item.rot += delta;
+    item.vel = delta;
   };
-  const onUp = () => {
+  const endDrag = () => {
     if (!dragging) return;
     dragging = false;
     // settle on whichever face is closer after the fling
-    const landing = rot + vel * 10;
+    const item = items[active];
+    const landing = item.rot + item.vel * 10;
     const faces = [nearestTurn(landing, 0), nearestTurn(landing, Math.PI)];
-    target = faces.reduce((a, b) => (Math.abs(b - landing) < Math.abs(a - landing) ? b : a));
+    item.target = faces.reduce((a, b) => (Math.abs(b - landing) < Math.abs(a - landing) ? b : a));
+  };
+  const onUp = (event: PointerEvent) => {
+    if (downTarget !== -1) {
+      const tap = Math.hypot(event.clientX - downX, event.clientY - downY) < 10;
+      if (tap && shirtAt(event) === downTarget) onSelect(downTarget);
+      downTarget = -1;
+      return;
+    }
+    endDrag();
+  };
+  const onCancel = () => {
+    downTarget = -1;
+    endDrag();
   };
   canvas.addEventListener("pointerdown", onDown);
   canvas.addEventListener("pointermove", onMove);
   canvas.addEventListener("pointerup", onUp);
-  canvas.addEventListener("pointercancel", onUp);
+  canvas.addEventListener("pointercancel", onCancel);
 
   const resizeObserver = new ResizeObserver(() => {
     resize();
@@ -375,7 +499,7 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
   intersection.observe(container);
   document.addEventListener("visibilitychange", updateRunning);
 
-  // the print uses the page fonts: wait for them, or the shirt would print in a fallback font
+  // the print uses the page fonts: wait for them, or the shirts would print in a fallback font
   Promise.all([
     document.fonts.load('800 40px "Bricolage Grotesque"'),
     document.fonts.load('condensed 800 40px "Bricolage Grotesque"'),
@@ -385,10 +509,11 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
     .catch(() => undefined)
     .then(() => {
       if (disposed) return;
-      drawFront(frontCanvas);
-      drawBack(backCanvas, side, signature);
-      frontTexture.needsUpdate = true;
-      backTexture.needsUpdate = true;
+      for (const item of items) {
+        drawFront(item.frontCanvas, item.sides);
+        drawBack(item.backCanvas, item.sides, item.seed, item.side, item.signature);
+        for (const texture of item.textures) texture.needsUpdate = true;
+      }
       resize();
       renderer.compile(scene, camera);
       render();
@@ -397,19 +522,25 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
     });
 
   return {
-    setSide(next) {
-      if (next === side) return;
-      const changed = side !== null && next !== null;
-      side = next;
-      if (!next) {
-        target = nearestTurn(rot, 0);
-        return;
-      }
-      target = nearestTurn(rot, Math.PI);
-      // a new side: the signature moves over and is drawn again
-      signature = 0;
-      signatureStart = changed && Math.abs(rot - target) < 0.35 ? performance.now() : -1;
-      backDirty = true;
+    setIndex(index) {
+      active = Math.max(0, Math.min(items.length - 1, index));
+    },
+    setSides(sides) {
+      items.forEach((item, index) => {
+        const next = sides[index] ?? null;
+        if (next === item.side) return;
+        const changed = item.side !== null && next !== null;
+        item.side = next;
+        if (next === null) {
+          item.target = nearestTurn(item.rot, 0);
+          return;
+        }
+        item.target = nearestTurn(item.rot, Math.PI);
+        // a new side: the signature moves over and is drawn again
+        item.signature = 0;
+        item.signatureStart = changed && Math.abs(item.rot - item.target) < 0.35 ? performance.now() : -1;
+        item.backDirty = true;
+      });
     },
     dispose() {
       disposed = true;
@@ -420,42 +551,66 @@ function createShirt(container: HTMLElement, reducedMotion: boolean, onReady: ()
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerup", onUp);
-      canvas.removeEventListener("pointercancel", onUp);
+      canvas.removeEventListener("pointercancel", onCancel);
+      for (const item of items) {
+        item.materials.forEach((material) => material.dispose());
+        item.textures.forEach((texture) => texture.dispose());
+        item.shadowMaterial.dispose();
+      }
       geometry.dispose();
-      frontMaterial.dispose();
-      backMaterial.dispose();
-      frontTexture.dispose();
-      backTexture.dispose();
+      hitGeometry.dispose();
+      hitMaterial.dispose();
+      shadowGeometry.dispose();
       shadowTexture.dispose();
-      shadow.geometry.dispose();
-      (shadow.material as THREE.Material).dispose();
       renderer.dispose();
       canvas.remove();
     },
   };
 }
 
-export default function Shirt3D({ side, onReady }: { side: Side | null; onReady: () => void }) {
+type Shirt3DProps = {
+  shirts: Sides[];
+  index: number;
+  sides: (SideIndex | null)[];
+  onSelect: (index: number) => void;
+  onReady: () => void;
+};
+
+export default function Shirt3D({ shirts, index, sides, onSelect, onReady }: Shirt3DProps) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const apiRef = useRef<ShirtApi | null>(null);
-  const readyRef = useRef(onReady);
-  readyRef.current = onReady;
+  const apiRef = useRef<ShowroomApi | null>(null);
+  const callbacks = useRef({ onSelect, onReady });
+  callbacks.current = { onSelect, onReady };
+  const initialIndex = useRef(index);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const api = createShirt(host, reduced, () => readyRef.current());
+    const api = createShowroom(
+      host,
+      shirts,
+      initialIndex.current,
+      reduced,
+      (i) => callbacks.current.onSelect(i),
+      () => callbacks.current.onReady(),
+    );
     apiRef.current = api;
     return () => {
       api.dispose();
       apiRef.current = null;
     };
+    // the shirt list is fixed for the life of the page
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    apiRef.current?.setSide(side);
-  }, [side]);
+    apiRef.current?.setIndex(index);
+  }, [index]);
+
+  useEffect(() => {
+    apiRef.current?.setSides(sides);
+  }, [sides]);
 
   return <div ref={hostRef} className="shirt3d" />;
 }

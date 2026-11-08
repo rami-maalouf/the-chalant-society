@@ -1,7 +1,10 @@
-// the shirt artwork, drawn in code. used by the 3d shirt (as textures) and nowhere else.
-// design space is 300 x 340, the same as the flat svg drawings.
+// the shirt artwork, drawn in code: the 3d shirts use it as textures, and the flat fallback
+// draws it straight into a canvas. design space is 300 x 340.
 
-import type { Side } from "./options";
+// the two words of a shirt, left then right
+export type Sides = readonly [string, string];
+// which side the visitor picked: 0 = left, 1 = right
+export type SideIndex = 0 | 1;
 
 export const DESIGN_W = 300;
 export const DESIGN_H = 340;
@@ -110,31 +113,26 @@ function condensed(ctx: Ctx) {
   if ("fontStretch" in ctx) (ctx as Ctx & { fontStretch: string }).fontStretch = "condensed";
 }
 
-export function drawFront(canvas: HTMLCanvasElement) {
+export function drawFront(canvas: HTMLCanvasElement, sides: Sides) {
+  const [leftWord, rightWord] = sides;
   const ctx = prepare(canvas, FRONT_NECK);
   ctx.fillStyle = INK;
   ctx.textBaseline = "alphabetic";
   condensed(ctx);
 
-  // chalant  vs  nonchalant, across the chest
+  // left  vs  right, across the chest
   const y = 124;
   const gap = 6;
   const vsSize = 17;
   ctx.font = marker(vsSize);
   const vsWidth = ctx.measureText("vs").width;
-  const wordSize = fitFont(
-    ctx,
-    "chalantnonchalant",
-    block,
-    146 - vsWidth - gap * 2,
-    34,
-  );
+  const wordSize = fitFont(ctx, leftWord + rightWord, block, 146 - vsWidth - gap * 2, 34);
   ctx.font = block(wordSize);
-  const left = ctx.measureText("chalant").width;
-  const right = ctx.measureText("nonchalant").width;
+  const left = ctx.measureText(leftWord).width;
+  const right = ctx.measureText(rightWord).width;
   const total = left + gap + vsWidth + gap + right;
   let x = 150 - total / 2;
-  ctx.fillText("chalant", x, y);
+  ctx.fillText(leftWord, x, y);
   x += left + gap;
   ctx.save();
   ctx.font = marker(vsSize);
@@ -145,7 +143,7 @@ export function drawFront(canvas: HTMLCanvasElement) {
   ctx.restore();
   x += vsWidth + gap;
   ctx.font = block(wordSize);
-  ctx.fillText("nonchalant", x, y);
+  ctx.fillText(rightWord, x, y);
 
   ctx.textAlign = "center";
   ctx.font = marker(12);
@@ -198,36 +196,44 @@ function strokePoints(ctx: Ctx, points: { x: number; y: number }[], progress = 1
   ctx.stroke();
 }
 
-// the strangers who already signed. left side = chalant, right side = nonchalant
-const SIGNED = {
-  chalant: [
-    { seed: 11, x: 82, y: 100, w: 54 },
-    { seed: 23, x: 88, y: 136, w: 46 },
-    { seed: 37, x: 80, y: 172, w: 56 },
-    { seed: 41, x: 90, y: 208, w: 44 },
+// the strangers who already signed: four on the left, three on the right.
+// `seed` changes the handwriting, so every shirt's back looks different
+const SIGNED: { x: number; y: number; w: number }[][] = [
+  [
+    { x: 82, y: 100, w: 54 },
+    { x: 88, y: 136, w: 46 },
+    { x: 80, y: 172, w: 56 },
+    { x: 90, y: 208, w: 44 },
   ],
-  nonchalant: [
-    { seed: 53, x: 162, y: 104, w: 52 },
-    { seed: 67, x: 168, y: 144, w: 46 },
-    { seed: 79, x: 160, y: 184, w: 54 },
+  [
+    { x: 162, y: 104, w: 52 },
+    { x: 168, y: 144, w: 46 },
+    { x: 160, y: 184, w: 54 },
   ],
-};
+];
 
-const VISITOR_SLOT: Record<Side, { x: number; y: number; w: number }> = {
-  chalant: { x: 82, y: 250, w: 56 },
-  nonchalant: { x: 162, y: 228, w: 56 },
-};
+const VISITOR_SLOT = [
+  { x: 82, y: 250, w: 56 },
+  { x: 162, y: 228, w: 56 },
+];
 
-export function drawBack(canvas: HTMLCanvasElement, visitorSide: Side | null, progress: number) {
+export function drawBack(
+  canvas: HTMLCanvasElement,
+  sides: Sides,
+  seed: number,
+  visitorSide: SideIndex | null,
+  progress: number,
+) {
   const ctx = prepare(canvas, BACK_NECK);
   ctx.fillStyle = INK;
   condensed(ctx);
 
-  ctx.font = block(16);
+  const headerSize = Math.min(fitFont(ctx, sides[0], block, 62, 16), fitFont(ctx, sides[1], block, 62, 16));
+  ctx.font = block(headerSize);
   ctx.textAlign = "right";
-  ctx.fillText("chalant", 143, 72);
+  ctx.fillText(sides[0], 143, 72);
   ctx.textAlign = "left";
-  ctx.fillText("nonchalant", 157, 72);
+  ctx.fillText(sides[1], 157, 72);
 
   ctx.strokeStyle = INK;
   ctx.lineCap = "round";
@@ -239,15 +245,15 @@ export function drawBack(canvas: HTMLCanvasElement, visitorSide: Side | null, pr
 
   ctx.lineWidth = 1.7;
   ctx.lineJoin = "round";
-  for (const [side, list] of Object.entries(SIGNED)) {
-    for (const sig of list) {
-      ctx.globalAlpha = side === "chalant" ? 0.86 : 0.8;
-      strokePoints(ctx, scribble(sig.seed, sig.x, sig.y, sig.w));
-    }
-  }
+  SIGNED.forEach((column, side) => {
+    column.forEach((sig, i) => {
+      ctx.globalAlpha = side === 0 ? 0.86 : 0.8;
+      strokePoints(ctx, scribble(seed * 101 + side * 13 + i * 7 + 11, sig.x, sig.y, sig.w));
+    });
+  });
   ctx.globalAlpha = 1;
 
-  if (visitorSide && progress > 0) {
+  if (visitorSide !== null && progress > 0) {
     const slot = VISITOR_SLOT[visitorSide];
     ctx.strokeStyle = AMBER;
     ctx.lineWidth = 2.4;

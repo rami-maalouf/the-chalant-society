@@ -387,6 +387,21 @@ FRONT                               BACK
 
 The `/merch` page shows this shirt in 3D (`src/merch/Shirt3D.tsx`, artwork in `src/merch/shirtArt.ts`). It is built in code, with no outside 3D model. When a visitor picks a side, the shirt turns to the back and their signature is drawn in amber on that side. Phones without WebGL 2 see the flat drawing (`src/merch/ShirtDrawings.tsx`).
 
+## 10b. more than one shirt
+
+Decided 2026-11-08: the page sells several shirts. Shirt 2 is **claude vs chatgpt** (front "claude vs chatgpt", back "claude | chatgpt"). The 3D view is a slider: the active shirt in the middle, the neighbours smaller and tinted at the sides. Tap a neighbour, the arrows, the dots, or press the arrow keys to switch. `?shirt=<id>` opens one shirt directly, for a QR code.
+
+The Notion database keeps one row per email **per shirt**.
+
+**To add a shirt:**
+
+1. add an entry to `SHIRTS` in `src/merch/options.ts` (id, Notion item name, the two side words, drop label)
+2. add its two reaction lines to `REACTIONS` in `src/merch/MerchPage.tsx` (TypeScript fails until you do)
+3. run `bun run merch:sync`. It adds the new item and side options to Notion. Notion rejects a sign-up whose option does not exist yet. The script only adds, it never removes
+4. check the shirt at 390 px and 1280 px
+
+Each shirt adds 2 textures to the 3D scene (about 6.5 MB of GPU memory each). Test on a mid-range phone after 4 or more shirts.
+
 ## 11. open questions for Rami
 
 Decided on 2026-11-08:

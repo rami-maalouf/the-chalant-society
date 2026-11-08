@@ -23,6 +23,8 @@ The site uses a fixed WebGL particle-crowd background as the central metaphor: o
 
 The developer brief for this work is `docs/revamp-and-merch-waitlist.md`.
 
+To add a shirt to `/merch`, follow section 10b of that brief. After changing the shirt list, run `bun run merch:sync` so Notion accepts the new shirt.
+
 ## Requirements
 
 - [Bun](https://bun.sh)

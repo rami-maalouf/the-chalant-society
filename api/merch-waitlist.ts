@@ -1,8 +1,9 @@
 import { Client } from "@notionhq/client";
 import {
-  ITEM,
+  SHIRTS,
   SOURCE_MAX,
-  isSide,
+  findShirt,
+  isSideOf,
   isSize,
   isValidEmail,
   normalizeEmail,
@@ -28,9 +29,12 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ success: true, alreadyAdded: false });
   }
 
+  // older clients sent no shirt: that was always the first one
+  const shirt = body.shirt === undefined ? SHIRTS[0] : findShirt(body.shirt);
+  if (!shirt) return json({ error: "unknown shirt" }, 400);
   const email = normalizeEmail(body.email);
   if (!isValidEmail(email)) return json({ error: "use a valid email address" }, 400);
-  if (!isSide(body.side)) return json({ error: "pick a side" }, 400);
+  if (!isSideOf(shirt, body.side)) return json({ error: "pick a side" }, 400);
   if (!isSize(body.size)) return json({ error: "pick your size" }, 400);
   const source = typeof body.source === "string" ? body.source.trim().slice(0, SOURCE_MAX) : "";
 
@@ -54,7 +58,7 @@ export default async function handler(request: Request): Promise<Response> {
       filter: {
         and: [
           { property: "Email", title: { equals: email } },
-          { property: "Item", select: { equals: ITEM } },
+          { property: "Item", select: { equals: shirt.item } },
         ],
       },
       page_size: 1,
@@ -71,7 +75,7 @@ export default async function handler(request: Request): Promise<Response> {
       parent: { type: "data_source_id", data_source_id: dataSourceId },
       properties: {
         Email: { title: [{ text: { content: email } }] },
-        Item: { select: { name: ITEM } },
+        Item: { select: { name: shirt.item } },
         ...choices,
       },
     });

@@ -1,9 +1,32 @@
 // shared by the /merch page and api/merch-waitlist.ts, so both use the same lists
 
-export const ITEM = "chalant | nonchalant tee";
+// every shirt on the page. add a shirt here and the page, the 3d slider and the api all pick it up.
+// `item` is the option in the notion "Item" column. `sides` are the two words, left then right.
+export const SHIRTS = [
+  {
+    id: "chalant-vs-nonchalant",
+    item: "chalant | nonchalant tee",
+    sides: ["chalant", "nonchalant"],
+    drop: "drop 01",
+  },
+  {
+    id: "claude-vs-chatgpt",
+    item: "claude | chatgpt tee",
+    sides: ["claude", "chatgpt"],
+    drop: "drop 02",
+  },
+] as const satisfies readonly { id: string; item: string; sides: readonly [string, string]; drop: string }[];
 
-export const SIDES = ["chalant", "nonchalant"] as const;
-export type Side = (typeof SIDES)[number];
+export type Shirt = (typeof SHIRTS)[number];
+export type ShirtId = Shirt["id"];
+
+export function findShirt(id: unknown): Shirt | undefined {
+  return SHIRTS.find((shirt) => shirt.id === id);
+}
+
+export function isSideOf(shirt: Shirt, value: unknown): value is string {
+  return typeof value === "string" && (shirt.sides as readonly string[]).includes(value);
+}
 
 export const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 export type Size = (typeof SIZES)[number];
@@ -11,10 +34,6 @@ export type Size = (typeof SIZES)[number];
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const EMAIL_MAX = 254;
 export const SOURCE_MAX = 50;
-
-export function isSide(value: unknown): value is Side {
-  return typeof value === "string" && (SIDES as readonly string[]).includes(value);
-}
 
 export function isSize(value: unknown): value is Size {
   return typeof value === "string" && (SIZES as readonly string[]).includes(value);
@@ -29,8 +48,9 @@ export function isValidEmail(email: string): boolean {
 }
 
 export type WaitlistRequest = {
+  shirt: ShirtId;
   email: string;
-  side: Side;
+  side: string;
   size: Size;
   source?: string;
   // honeypot: real people never fill it

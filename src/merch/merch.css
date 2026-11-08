@@ -104,6 +104,7 @@ a {
 .merch {
   position: relative;
   z-index: 1;
+  overflow-x: clip; /* the full-width shirt slider must never cause sideways scrolling */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -183,23 +184,43 @@ a {
   transform: rotate(-8deg);
 }
 
+/* the shirt slider. it runs edge to edge, so the neighbouring shirts peek in from the sides */
+.stage-anchor {
+  scroll-margin-top: 1rem;
+}
+
+.shirt-carousel {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  border-radius: 16px;
+}
+
+.shirt-carousel:focus-visible {
+  outline-offset: -4px;
+}
+
 /* the shirt on its stage: a flat drawing first, then the 3d shirt fades in over it */
 .shirt-stage {
   position: relative;
-  width: min(100%, 26rem);
+  width: 100%;
   height: clamp(18rem, 44vh, 30rem);
-  margin: 0 auto 0.4rem;
+  margin: 0 auto;
 }
 
 .shirt-flat {
   position: absolute;
-  inset: 4% 12% 12%;
+  inset: 3% 0 6%;
+  display: flex;
+  justify-content: center;
   transition: opacity 500ms ease;
 }
 
-.shirt-flat .tee {
-  width: 100%;
+.shirt-flat-canvas {
   height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .shirt-stage.is-3d .shirt-flat {
@@ -208,7 +229,7 @@ a {
 
 .shirt3d {
   position: absolute;
-  inset: 0 0 1.6rem;
+  inset: 0;
   opacity: 0;
   transition: opacity 700ms ease;
 }
@@ -229,12 +250,96 @@ a {
   cursor: grabbing;
 }
 
-.shirt-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.carousel-nav {
+  display: grid;
+  grid-template-columns: 2.75rem auto 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: var(--column);
+  margin: 0.2rem auto 0;
+}
+
+.carousel-arrow {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--cotton);
+  color: var(--ink);
+  font-size: 1.15rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 140ms ease,
+    opacity 200ms ease;
+}
+
+.carousel-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.carousel-label {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  min-width: 11rem;
+}
+
+.carousel-name {
   margin: 0;
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 80, "opsz" 24;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 0.15rem;
+}
+
+/* each dot is a 28px target with a small mark inside */
+.carousel-dot {
+  appearance: none;
+  position: relative;
+  width: 1.75rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.carousel-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 220ms var(--ease-out),
+    background-color 220ms ease;
+}
+
+.carousel-dot.is-active::after {
+  width: 1.3rem;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.shirt-hint {
+  margin: 0.5rem 0 0;
   font-size: 0.9rem;
   color: var(--ink-faint);
   transform: rotate(-2deg);
@@ -262,12 +367,12 @@ a {
   transform: translateY(1px);
 }
 
-.side-chalant {
+.side-left {
   padding-right: clamp(0.6rem, 3vw, 2rem);
   text-align: right;
 }
 
-.side-nonchalant {
+.side-right {
   padding-left: clamp(0.6rem, 3vw, 2rem);
   text-align: left;
 }
@@ -318,11 +423,11 @@ a {
   overflow: visible;
 }
 
-.side-chalant .side-scribble {
+.side-left .side-scribble {
   right: clamp(0.6rem, 3vw, 2rem);
 }
 
-.side-nonchalant .side-scribble {
+.side-right .side-scribble {
   left: clamp(0.6rem, 3vw, 2rem);
 }
 
@@ -584,6 +689,21 @@ a {
   font-weight: 600;
 }
 
+.success-next {
+  appearance: none;
+  justify-self: start;
+  padding: 0.3rem 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .success-links {
   display: flex;
   flex-wrap: wrap;
@@ -613,113 +733,6 @@ a {
 .faq {
   width: var(--column);
   margin: 0 auto;
-}
-
-.tee {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.tee-body {
-  fill: #fff;
-  stroke: var(--ink);
-  stroke-width: 2.4;
-  stroke-linejoin: round;
-}
-
-.tee-seam,
-.tee-cord {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.4;
-  opacity: 0.45;
-}
-
-.tee-word {
-  font-family: var(--font-block);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75, "opsz" 24;
-  font-size: 15px;
-  letter-spacing: -0.02em;
-  fill: var(--ink);
-}
-
-.tee-word-small {
-  font-size: 11px;
-}
-
-.tee-vs {
-  font-family: var(--font-hand);
-  font-size: 11px;
-  fill: var(--ink);
-}
-
-.tee-divider {
-  stroke: var(--ink);
-  stroke-width: 2.6;
-  stroke-linecap: round;
-}
-
-.tee-hand {
-  font-family: var(--font-hand);
-  font-size: 13px;
-  fill: var(--ink);
-}
-
-.tee-handle {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 7.5px;
-  fill: var(--ink-soft);
-}
-
-.tee-loop {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-}
-
-.tee-marker {
-  fill: #fff;
-  stroke: var(--ink);
-  stroke-width: 1.2;
-}
-
-.tee-marker-cap {
-  fill: var(--ink);
-}
-
-.tee-signature {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  transition:
-    stroke-dashoffset 700ms var(--ease-out),
-    opacity 1ms linear;
-}
-
-.tee-back.is-signed .tee-signature {
-  stroke-dashoffset: 0;
-  opacity: 1;
-}
-
-.tee-you {
-  font-family: var(--font-hand);
-  font-size: 14px;
-  fill: var(--amber-ink);
-  opacity: 0;
-  transition: opacity 500ms ease 1100ms;
-}
-
-.tee-back.is-signed .tee-you {
-  opacity: 1;
 }
 
 /* why */
@@ -830,6 +843,14 @@ a {
 
 /* hover styles only where a real pointer hovers. on phones a tap would leave them stuck */
 @media (hover: hover) {
+  .carousel-arrow:hover:not(:disabled) {
+    background: var(--cotton-deep);
+  }
+
+  .success-next:hover {
+    color: var(--amber-ink);
+  }
+
   a:hover {
     color: var(--amber-ink);
   }
@@ -868,7 +889,6 @@ a {
   }
 
   .shirt-stage {
-    width: min(100%, 36rem);
     height: clamp(22rem, 56vh, 38rem);
   }
 
