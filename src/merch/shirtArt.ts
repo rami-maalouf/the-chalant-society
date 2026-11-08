@@ -85,8 +85,9 @@ function finish(ctx: Ctx, neckDepth: number) {
   ctx.restore();
 
   // the marker outline, so the shirt matches the drawn style of the page
-  ctx.strokeStyle = "#45423d";
-  ctx.lineWidth = 1.1;
+  // a light edge only: front and back read as one piece of fabric, not two halves
+  ctx.strokeStyle = "#a8a397";
+  ctx.lineWidth = 0.8;
   ctx.lineJoin = "round";
   ctx.stroke(shape);
 }

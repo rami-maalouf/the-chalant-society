@@ -21,8 +21,55 @@ function makeCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
-// the volume of the shirt: an oval cross-section across the body, thinner sleeves,
-// and edges that close smoothly at the hem and shoulders
+// exact euclidean distance transform (felzenszwalb), one dimension at a time
+function edt1d(f: Float32Array, n: number, out: Float32Array, v: Int32Array, z: Float32Array) {
+  let k = 0;
+  v[0] = 0;
+  z[0] = -Infinity;
+  z[1] = Infinity;
+  for (let q = 1; q < n; q++) {
+    let s = (f[q] + q * q - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    while (s <= z[k]) {
+      k--;
+      s = (f[q] + q * q - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    }
+    k++;
+    v[k] = q;
+    z[k] = s;
+    z[k + 1] = Infinity;
+  }
+  k = 0;
+  for (let q = 0; q < n; q++) {
+    while (z[k + 1] < q) k++;
+    out[q] = (q - v[k]) * (q - v[k]) + f[v[k]];
+  }
+}
+
+// distance from every inside pixel to the nearest outline point, in design px
+function distanceField(inside: Uint8Array, w: number, h: number): Float32Array {
+  const BIG = 1e10;
+  const grid = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) grid[i] = inside[i] ? BIG : 0;
+  const n = Math.max(w, h);
+  const f = new Float32Array(n);
+  const out = new Float32Array(n);
+  const v = new Int32Array(n);
+  const z = new Float32Array(n + 1);
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) f[y] = grid[y * w + x];
+    edt1d(f, h, out, v, z);
+    for (let y = 0; y < h; y++) grid[y * w + x] = out[y];
+  }
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) f[x] = grid[y * w + x];
+    edt1d(f, w, out, v, z);
+    for (let x = 0; x < w; x++) grid[y * w + x] = Math.sqrt(out[x]);
+  }
+  return grid;
+}
+
+// the volume of the shirt, as one piece: the depth at any point depends only on how far it is
+// from the outline, so the body, shoulders and sleeves flow into each other with no seams
 function buildGeometry(): THREE.PlaneGeometry {
   const mw = DESIGN_W;
   const mh = DESIGN_H;
@@ -33,41 +80,36 @@ function buildGeometry(): THREE.PlaneGeometry {
   mctx.fillStyle = "#fff";
   mctx.fill(silhouettePath());
   const alpha = mctx.getImageData(0, 0, mw, mh).data;
-  const inside = (x: number, y: number) => alpha[(y * mw + x) * 4 + 3] > 127;
-
-  // distance to the outline along the row (dx), half the width of that row's run (rx),
-  // and distance to the outline along the column (dy)
-  const dx = new Float32Array(mw * mh);
-  const rx = new Float32Array(mw * mh);
-  const dy = new Float32Array(mw * mh);
-  for (let y = 0; y < mh; y++) {
-    let x = 0;
-    while (x < mw) {
-      if (!inside(x, y)) {
-        x++;
-        continue;
+  const inside = new Uint8Array(mw * mh);
+  for (let i = 0; i < mw * mh; i++) inside[i] = alpha[i * 4 + 3] > 127 ? 1 : 0;
+  const raw = distanceField(inside, mw, mh);
+  // blur the field: a raw distance field has sharp ridges down the middle of each part,
+  // which would show as creases. three box passes are close to a gaussian
+  const dist = raw.slice();
+  const tmp = new Float32Array(mw * mh);
+  const radius = 9;
+  for (let pass = 0; pass < 3; pass++) {
+    for (let y = 0; y < mh; y++) {
+      let acc = 0;
+      for (let x = -radius; x <= radius; x++) acc += dist[y * mw + Math.min(mw - 1, Math.max(0, x))];
+      for (let x = 0; x < mw; x++) {
+        tmp[y * mw + x] = acc / (radius * 2 + 1);
+        acc += dist[y * mw + Math.min(mw - 1, x + radius + 1)] - dist[y * mw + Math.max(0, x - radius)];
       }
-      const start = x;
-      while (x < mw && inside(x, y)) x++;
-      const end = x;
-      for (let i = start; i < end; i++) {
-        dx[y * mw + i] = Math.min(i - start, end - 1 - i) + 0.5;
-        rx[y * mw + i] = (end - start) / 2;
+    }
+    for (let x = 0; x < mw; x++) {
+      let acc = 0;
+      for (let y = -radius; y <= radius; y++) acc += tmp[Math.min(mh - 1, Math.max(0, y)) * mw + x];
+      for (let y = 0; y < mh; y++) {
+        dist[y * mw + x] = acc / (radius * 2 + 1);
+        acc += tmp[Math.min(mh - 1, y + radius + 1) * mw + x] - tmp[Math.max(0, y - radius) * mw + x];
       }
     }
   }
-  for (let x = 0; x < mw; x++) {
-    let y = 0;
-    while (y < mh) {
-      if (!inside(x, y)) {
-        y++;
-        continue;
-      }
-      const start = y;
-      while (y < mh && inside(x, y)) y++;
-      const end = y;
-      for (let i = start; i < end; i++) dy[i * mw + x] = Math.min(i - start, end - 1 - i) + 0.5;
-    }
+  // keep the true distance right at the edge, so the outline still closes cleanly
+  for (let i = 0; i < mw * mh; i++) {
+    if (!inside[i]) dist[i] = 0;
+    else if (raw[i] < 6) dist[i] = Math.min(dist[i], raw[i] * 1.6);
   }
 
   const segX = 150;
@@ -77,24 +119,33 @@ function buildGeometry(): THREE.PlaneGeometry {
   const uv = geometry.attributes.uv as THREE.BufferAttribute;
   const heights = new Float32Array(pos.count);
 
+  // bilinear sample, so the surface does not step from pixel to pixel
+  const sample = (u: number, v: number) => {
+    const x = Math.min(mw - 1.001, Math.max(0, u * (mw - 1)));
+    const y = Math.min(mh - 1.001, Math.max(0, (1 - v) * (mh - 1)));
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    const tx = x - x0;
+    const ty = y - y0;
+    const a = dist[y0 * mw + x0];
+    const b = dist[y0 * mw + x0 + 1];
+    const c = dist[(y0 + 1) * mw + x0];
+    const d = dist[(y0 + 1) * mw + x0 + 1];
+    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+  };
+
   for (let i = 0; i < pos.count; i++) {
-    const px = Math.min(mw - 1, Math.max(0, Math.round(uv.getX(i) * (mw - 1))));
-    const py = Math.min(mh - 1, Math.max(0, Math.round((1 - uv.getY(i)) * (mh - 1))));
-    const k = py * mw + px;
-    if (!inside(px, py)) continue;
-    // an oval across each run: full depth on the body, thinner on the sleeves
-    const radius = rx[k];
-    const u = 1 - dx[k] / radius;
-    const across = Math.sqrt(Math.max(0, 1 - u * u));
-    const runDepth = DEPTH * Math.min(1, radius / 80) ** 0.6;
-    const close = Math.min(1, Math.sqrt(dy[k] / 16));
-    heights[i] = runDepth * across * close;
+    const d = sample(uv.getX(i), uv.getY(i));
+    if (d <= 0) continue;
+    // rounds over quickly at the edge, then keeps rising slowly toward the middle of the body
+    const t = Math.min(d / 64, 1);
+    heights[i] = DEPTH * Math.sin((t * Math.PI) / 2) ** 0.7;
   }
 
   // soften the field so the fabric has no creases from the pixel grid
   const cols = segX + 1;
   const rows = segY + 1;
-  for (let pass = 0; pass < 3; pass++) {
+  for (let pass = 0; pass < 4; pass++) {
     const copy = heights.slice();
     for (let r = 1; r < rows - 1; r++) {
       for (let c = 1; c < cols - 1; c++) {
