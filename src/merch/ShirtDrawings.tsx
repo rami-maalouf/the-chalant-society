@@ -19,12 +19,12 @@ const RIGHT_SIGNATURES = [
 
 export function ShirtFront() {
   return (
-    <svg className="tee" viewBox="0 0 300 340" role="img" aria-label="The front of the shirt: chalant, a line, nonchalant. Under it: pick a side, sign my back.">
+    <svg className="tee" viewBox="0 0 300 340" role="img" aria-label="The front of the shirt: chalant vs nonchalant. Under it: pick a side, sign my back.">
       <path d={TEE} className="tee-body" />
       <path d="M100,22 Q150,62 200,22" className="tee-seam" />
-      <text x="143" y="126" textAnchor="end" className="tee-word">chalant</text>
-      <text x="159" y="126" textAnchor="start" className="tee-word">nonchalant</text>
-      <line x1="151" y1="98" x2="151" y2="144" className="tee-divider" />
+      <text x="137" y="124" textAnchor="end" className="tee-word">chalant</text>
+      <text x="150" y="122" textAnchor="middle" className="tee-vs">vs</text>
+      <text x="163" y="124" textAnchor="start" className="tee-word">nonchalant</text>
       <text x="150" y="188" textAnchor="middle" className="tee-hand">pick a side.</text>
       <text x="150" y="206" textAnchor="middle" className="tee-hand">sign my back.</text>
       <text x="150" y="300" textAnchor="middle" className="tee-handle">@thechalantsociety</text>

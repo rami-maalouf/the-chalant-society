@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { LINKS } from "../shared/links";
-import { ShirtBack, ShirtFront } from "./ShirtDrawings";
+import ShirtStage from "./ShirtStage";
 import {
   SIZES,
   SOURCE_MAX,
@@ -35,8 +35,13 @@ export default function MerchPage() {
     const first = side === null;
     setSide(next);
     if (first) {
-      // let the form mount, then bring it into view without stealing focus (no keyboard pop-up)
-      requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }));
+      // first let them watch the shirt turn and their signature appear, then bring the form into view.
+      // no focus, so the phone keyboard does not pop up. skip it if they already scrolled themselves
+      const startY = window.scrollY;
+      window.setTimeout(() => {
+        if (Math.abs(window.scrollY - startY) > 40) return;
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 1900);
     }
   };
 
@@ -51,14 +56,18 @@ export default function MerchPage() {
 
       <main>
         <section className="debate" aria-labelledby="debate-title">
-          <p className="hand debate-kicker">settle a debate</p>
           <h1 id="debate-title" className="visually-hidden">
-            chalant or nonchalant? pick a side.
+            chalant vs nonchalant? pick a side.
           </h1>
 
+          <ShirtStage side={side} />
+
+          <p className="hand debate-kicker">settle a debate</p>
           <div className="debate-board" role="group" aria-label="pick a side">
             <SideButton value="chalant" picked={side} onPick={pick} />
-            <span className="debate-line" aria-hidden />
+            <span className="debate-vs hand" aria-hidden>
+              vs
+            </span>
             <SideButton value="nonchalant" picked={side} onPick={pick} />
           </div>
 
@@ -79,16 +88,6 @@ export default function MerchPage() {
 
         <section className="how" aria-labelledby="how-title">
           <h2 id="how-title" className="section-title">how the shirt works</h2>
-          <div className="how-shirts">
-            <figure>
-              <ShirtFront />
-              <figcaption className="hand">front</figcaption>
-            </figure>
-            <figure>
-              <ShirtBack />
-              <figcaption className="hand">back</figcaption>
-            </figure>
-          </div>
           <ol className="how-steps">
             <li>
               <span className="step-num" aria-hidden>1</span>

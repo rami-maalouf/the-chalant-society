@@ -374,20 +374,24 @@ The home page is done when bugs 1 to 8 in section 6.1 are fixed and checked with
 | 2 | home page bug fixes and content updates, the shirt teaser section | content depends on Rami's answers in section 6.2 |
 | 3 (later) | a live tally on `/merch` ("214 chalant, 37 nonchalant"), read from Notion and cached for 60 seconds | only worth it once the list has real numbers. Notion allows about 3 requests per second, so the tally must be cached |
 
-## 10. reference: the prototype shirt
+## 10. reference: the shirt
+
+Decided 2026-11-08: the **front** says "chalant vs nonchalant" with no line. The **back** has the line down the middle, and strangers sign on their side.
 
 ```
 FRONT                               BACK
 +----------------------------+      +----------------------------+
-|   chalant  |  nonchalant   |      |   chalant  |  nonchalant   |
-|            |               |      |  .......   |   .......     |
-|      pick a side.          |      |  : sign :  |   : sign :    |
-|      sign my back.         |      |  : here :  |   : here :    |
-|                            |      |  :......:  |   :.......:   |
+| chalant  vs  nonchalant    |      |   chalant  |  nonchalant   |
+|                            |      |   ~~~~     |    ~~~~       |
+|      pick a side.          |      |   ~~~~     |    ~~~~       |
+|      sign my back.         |      |   ~~~~     |               |
+|                            |      |            |               |
 |   @thechalantsociety    o~ |      |            |               |
 +----------------------------+      +----------------------------+
                           marker on a loop at the hem
 ```
+
+The `/merch` page shows this shirt in 3D (`src/merch/Shirt3D.tsx`, artwork in `src/merch/shirtArt.ts`). It is built in code, with no outside 3D model. When a visitor picks a side, the shirt turns to the back and their signature is drawn in amber on that side. Phones without WebGL 2 see the flat drawing (`src/merch/ShirtDrawings.tsx`).
 
 ## 11. open questions for Rami
 
