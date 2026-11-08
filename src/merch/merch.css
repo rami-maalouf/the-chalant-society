@@ -884,7 +884,7 @@ a {
     opacity: 0.7;
   }
 
-  .size:hover {
+  .size:hover:not(.is-picked) {
     background: var(--cotton-deep);
   }
 
