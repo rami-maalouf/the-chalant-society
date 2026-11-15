@@ -27,7 +27,7 @@ async function loadApiRoute(root: string, name: string) {
   }
 }
 
-// in dev, serve /merch like vercel does (cleanUrls) and run the files in api/ as routes,
+// in dev, serve /merch and /crowd like vercel does (cleanUrls) and run the files in api/ as routes,
 // so `bun run dev` works without the vercel cli
 function devRoutes(): Plugin {
   return {
@@ -36,8 +36,9 @@ function devRoutes(): Plugin {
       server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
         const url = new URL(req.url ?? '/', 'http://localhost');
 
-        if (url.pathname === '/merch' || url.pathname === '/merch/') {
-          req.url = '/merch.html' + url.search;
+        const page = url.pathname.replace(/\/$/, '');
+        if (page === '/merch' || page === '/crowd') {
+          req.url = page + '.html' + url.search;
           return next();
         }
 
@@ -84,6 +85,7 @@ export default defineConfig(({ mode }) => {
         input: {
           main: path.resolve(__dirname, 'index.html'),
           merch: path.resolve(__dirname, 'merch.html'),
+          crowd: path.resolve(__dirname, 'crowd.html'),
         },
       },
     },

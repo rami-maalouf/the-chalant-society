@@ -2,7 +2,7 @@
 
 Website for The Chalant Society: a community and coaching project around rejection therapy, social courage, charisma, and care.
 
-The site uses a fixed WebGL particle-crowd background as the central metaphor: one standout figure surrounded by a crowd. Foreground copy scrolls over the scene while the camera slowly pulls back to reveal the wider social context.
+The home page is a scroll story: one person breaks the script, gets rejected, goes again, and the courage spreads to the whole room. The earlier home page at `/crowd` uses a fixed WebGL particle-crowd background as the central metaphor: one standout figure surrounded by a crowd. Foreground copy scrolls over the scene while the camera slowly pulls back to reveal the wider social context.
 
 ## Stack
 
@@ -17,9 +17,12 @@ The site uses a fixed WebGL particle-crowd background as the central metaphor: o
 
 ## Pages
 
-- `/` (`index.html`, `src/App.tsx`): the home page with the WebGL crowd
-- `/merch` (`merch.html`, `src/merch/`): the waitlist for the first shirt. It loads no Three.js, so it stays fast on phones
+- `/` (`index.html`): the home page, a scroll story drawn in one SVG, then coaching and community. It is plain HTML with one inline script: no React, no Three.js, no bundle. Share links: `/#coaching`, `/#doors`, `/#community`
+- `/crowd` (`crowd.html`, `src/App.tsx`): the earlier home page with the WebGL particle crowd. Search engines do not index it
+- `/merch` (`merch.html`, `src/merch/`): the waitlist for the first shirt. It loads no Three.js crowd, so it stays fast on phones
 - `api/merch-waitlist.ts`: a Vercel edge function that saves a sign-up to the "Chalant Merch Waitlist" Notion database
+
+Each page is its own Vite entry, so `/` never loads the code of `/crowd` or `/merch`.
 
 The developer brief for this work is `docs/revamp-and-merch-waitlist.md`.
 
@@ -28,7 +31,7 @@ To add a shirt to `/merch`, follow section 10b of that brief. After changing the
 ## Requirements
 
 - [Bun](https://bun.sh)
-- A browser with WebGL 2 support and floating-point or half-float color buffer render targets (home page only)
+- A browser with WebGL 2 support and floating-point or half-float color buffer render targets (`/crowd` only)
 
 ## Environment
 
@@ -73,7 +76,7 @@ src/
 ## Build
 
 ```bash
-npm run build
+bun run build
 ```
 
 The production build is emitted to `dist/`.
