@@ -1,19 +1,22 @@
-/* /merch: the page is the white shirt */
+/* /merch: the page is the white shirt. type, ink and sign-off come from the home page */
 
 :root {
   --cotton: #fbfbf9;
   --cotton-deep: #f2f0ea;
-  --ink: #121110;
-  --ink-soft: #57544d;
+  --ink: #0b0b0b; /* the home page's ink */
+  --ink-soft: #55524b;
   --ink-faint: #8b877d;
+  --paper: #f0ece3; /* the home page's paper */
+  --tomato: #ff5a36; /* the home page's strike */
   --seam: #dcd8cf;
   --amber: #ffb000;
   --amber-ink: #a35200; /* amber that passes contrast on cotton */
   --danger: #b3261e;
 
-  --font-block: "Bricolage Grotesque", "Arial Narrow", sans-serif;
-  --font-body: "Instrument Sans", "Helvetica Neue", sans-serif;
-  --font-serif: "Crimson Pro", Georgia, serif;
+  --font-block: "Archivo", "Arial Narrow", sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono: "Martian Mono", ui-monospace, monospace;
   --font-hand: "Permanent Marker", "Marker Felt", cursive;
 
   --gutter: clamp(1.25rem, 5vw, 2.5rem);
@@ -95,6 +98,17 @@ a {
   border: 0;
 }
 
+/* the small uppercase labels of the home page */
+.mono {
+  font-family: var(--font-mono);
+  font-variation-settings: "wdth" 87;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .hand {
   font-family: var(--font-hand);
   font-weight: 400;
@@ -130,21 +144,17 @@ a {
   padding: max(1.25rem, env(safe-area-inset-top)) 0 0;
 }
 
-.merch-logo {
-  font-family: var(--font-block);
-  font-weight: 800;
-  font-size: 1rem;
-  letter-spacing: -0.01em;
+/* the same brand line as the top of the home page */
+.merch-brand {
+  padding: 4px 0;
+  font-family: var(--font-mono);
+  font-variation-settings: "wdth" 87;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
   color: var(--ink);
-}
-
-.merch-logo em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 800;
-  font-size: 1.12em;
-  color: var(--amber-ink);
 }
 
 .merch-tag {
@@ -295,9 +305,9 @@ a {
   margin: 0;
   font-family: var(--font-block);
   font-weight: 800;
-  font-variation-settings: "wdth" 80, "opsz" 24;
+  font-variation-settings: "wdth" 80;
   font-size: 1.05rem;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .carousel-dots {
@@ -387,11 +397,10 @@ a {
   display: inline-block;
   font-family: var(--font-block);
   font-weight: 800;
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75, "opsz" 96;
+  font-variation-settings: "wdth" 74;
   font-size: clamp(2.05rem, 9.4vw, 4.6rem);
-  line-height: 0.95;
-  letter-spacing: -0.025em;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
 }
 
 /* the amber highlighter swipe behind the picked word */
@@ -414,21 +423,14 @@ a {
   transform: scaleX(1) rotate(-1.5deg);
 }
 
-/* the signature, drawn under the picked word */
+/* the signature, drawn under the picked word and as wide as the word */
 .side-scribble {
   position: absolute;
-  bottom: 0.7rem;
-  width: min(72%, 15rem);
-  height: 1.9rem;
+  top: calc(100% + 0.12em);
+  left: 2%;
+  width: 96%;
+  height: 0.42em;
   overflow: visible;
-}
-
-.side-left .side-scribble {
-  right: clamp(0.6rem, 3vw, 2rem);
-}
-
-.side-right .side-scribble {
-  left: clamp(0.6rem, 3vw, 2rem);
 }
 
 .side-scribble path {
@@ -498,10 +500,10 @@ a {
   margin: 0 0 1.35rem;
   font-family: var(--font-block);
   font-weight: 800;
-  font-variation-settings: "wdth" 85, "opsz" 48;
-  font-size: clamp(1.45rem, 6vw, 1.8rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-variation-settings: "wdth" 78;
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
 }
 
 .signup-form {
@@ -516,9 +518,10 @@ a {
 
 .field-label {
   margin: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-variation-settings: "wdth" 87;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -596,9 +599,10 @@ a {
   border-radius: 10px;
   background: var(--cotton);
   color: var(--ink);
-  font-family: var(--font-block);
-  font-weight: 800;
-  font-size: 0.98rem;
+  font-family: var(--font-mono);
+  font-variation-settings: "wdth" 87;
+  font-weight: 500;
+  font-size: 0.85rem;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -628,8 +632,9 @@ a {
   color: var(--cotton);
   font-family: var(--font-block);
   font-weight: 800;
+  font-variation-settings: "wdth" 90;
   font-size: 1.12rem;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -723,61 +728,63 @@ a {
   margin: 0 0 1.6rem;
   font-family: var(--font-block);
   font-weight: 800;
-  font-variation-settings: "wdth" 80, "opsz" 72;
-  font-size: clamp(1.9rem, 8vw, 2.6rem);
-  line-height: 1;
-  letter-spacing: -0.025em;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
 }
 
-.why,
-.faq {
-  width: var(--column);
-  margin: 0 auto;
-}
-
-/* why */
+/* why: a band of the home page's ink, with its opening line */
 
 .why {
-  padding: clamp(4.5rem, 12vh, 7rem) 0 clamp(4rem, 10vh, 6rem);
+  position: relative;
+  margin-top: clamp(4.5rem, 12vh, 7rem);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.why-inner {
+  width: var(--column);
+  margin: 0 auto;
+  padding: clamp(4rem, 11vh, 6.5rem) 0 clamp(4rem, 10vh, 6rem);
+}
+
+.why-kicker {
+  margin: 0 0 1.3rem;
+  opacity: 0.6;
+}
+
+.why-lead {
+  margin: 0 0 1.4rem;
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(2.3rem, 9.5vw, 4.2rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
 }
 
 .why-line {
   margin: 0;
   font-family: var(--font-serif);
   font-style: italic;
-  font-weight: 600;
-  font-size: clamp(1.5rem, 6.2vw, 2.1rem);
-  line-height: 1.22;
-  color: var(--ink-soft);
-}
-
-.why-lead {
-  margin-bottom: 0.9rem;
-  font-family: var(--font-block);
-  font-style: normal;
-  font-weight: 800;
-  font-variation-settings: "wdth" 80, "opsz" 72;
-  font-size: clamp(1.9rem, 8vw, 2.6rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-}
-
-.why-lead em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--amber-ink);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 5.2vw, 1.75rem);
+  line-height: 1.3;
+  opacity: 0.72;
 }
 
 .why-last {
-  margin-top: 0.9rem;
-  color: var(--ink);
+  margin-top: 0.7rem;
+  opacity: 1;
 }
 
 /* faq */
 
 .faq {
-  padding: 0 0 clamp(4rem, 10vh, 6rem);
+  width: var(--column);
+  margin: 0 auto;
+  padding: clamp(4rem, 10vh, 6rem) 0 clamp(4rem, 10vh, 6rem);
 }
 
 .faq details {
@@ -796,7 +803,8 @@ a {
   min-height: 3.6rem;
   padding: 0.8rem 0;
   font-weight: 600;
-  font-size: 1.08rem;
+  font-variation-settings: "wdth" 90;
+  font-size: 1.1rem;
   cursor: pointer;
   list-style: none;
 }
@@ -824,21 +832,58 @@ a {
 
 /* footer */
 
+/* footer: the home page's sign-off, then the way back into the site */
 .merch-footer {
-  flex-wrap: wrap;
-  padding: 1.6rem 0 max(1.8rem, env(safe-area-inset-bottom));
-  border-top: 1px solid var(--seam);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.6rem;
+  padding: 2.4rem 0 max(2.2rem, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--ink);
 }
 
-.merch-footer nav {
-  display: flex;
-  gap: 1.2rem;
-  font-size: 0.95rem;
-}
-
-.merch-footer nav a {
-  color: var(--ink-soft);
+.signoff {
+  font-family: var(--font-block);
+  font-weight: 800;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(2.6rem, 11vw, 4.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
   text-decoration: none;
+  color: var(--ink);
+}
+
+.non {
+  position: relative;
+  display: inline-block;
+}
+
+/* the tomato strike from the end of the home page story */
+.strike {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 52%;
+  height: 0.13em;
+  border-radius: 99px;
+  background: var(--tomato);
+  transform: rotate(-5deg);
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+}
+
+.footer-nav a {
+  padding: 4px 0;
+  font-family: var(--font-mono);
+  font-variation-settings: "wdth" 87;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
 }
 
 /* hover styles only where a real pointer hovers. on phones a tap would leave them stuck */
@@ -872,8 +917,16 @@ a {
     box-shadow: 4px 4px 0 var(--amber);
   }
 
-  .merch-footer nav a:hover {
+  .footer-nav a:hover {
     color: var(--ink);
+  }
+
+  .signoff:hover {
+    color: var(--ink);
+  }
+
+  .signoff:hover .strike {
+    transform: rotate(-5deg) scaleX(1.06);
   }
 }
 

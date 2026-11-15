@@ -100,8 +100,8 @@ export default function MerchPage() {
   return (
     <div className="merch">
       <header className="merch-header">
-        <a className="merch-logo" href="/" aria-label="The Chalant Society home">
-          The <em>Chalant</em> Society
+        <a className="merch-brand" href="/" aria-label="The Chalant Society home">
+          the chalant society
         </a>
         <span className="merch-tag">{shirt.drop}</span>
       </header>
@@ -163,13 +163,15 @@ export default function MerchPage() {
         </div>
 
         <section className="why" aria-labelledby="why-title">
-          <h2 id="why-title" className="visually-hidden">why these shirts exist</h2>
-          <p className="why-line why-lead">
-            nobody is non<em>chalant</em> by choice.
-          </p>
-          <p className="why-line">we want to talk to the stranger next to us.</p>
-          <p className="why-line">we just don't have a reason.</p>
-          <p className="why-line why-last">so we put the reason on a shirt.</p>
+          <div className="why-inner">
+            <p className="mono why-kicker">why a shirt</p>
+            <h2 id="why-title" className="why-lead">
+              everyone wants to connect but nobody goes first.
+            </h2>
+            <p className="why-line">we want to talk to the stranger next to us.</p>
+            <p className="why-line">we just don't have a reason.</p>
+            <p className="why-line why-last">so we put the reason on a shirt.</p>
+          </div>
         </section>
 
         <section className="faq" aria-labelledby="faq-title">
@@ -181,20 +183,28 @@ export default function MerchPage() {
           <details>
             <summary>what is the chalant society?</summary>
             <p>
-              a community for social courage. we do small, scary, real-world challenges together, then talk about
-              them. <a href="/">see what we do</a>.
+              a community and 1-on-1 coaching for social courage. small dares with real people, 1% outside your
+              comfort zone at a time. <a href="/">see the story</a>.
             </p>
           </details>
         </section>
       </main>
 
       <footer className="merch-footer">
-        <a className="merch-logo" href="/">
-          The <em>Chalant</em> Society
+        <a className="signoff" href="/" aria-label="be chalant. back to the home page">
+          be{" "}
+          <span className="non">
+            non
+            <span className="strike" aria-hidden />
+          </span>
+          chalant.
         </a>
-        <nav aria-label="Connect">
-          <a href={LINKS.instagram} target="_blank" rel="noreferrer">instagram</a>
+        <nav className="footer-nav" aria-label="The Chalant Society">
+          <a href="/">the story</a>
+          <a href="/#coaching">coaching</a>
+          <a href="/#community">draw a dare</a>
           <a href={LINKS.discord} target="_blank" rel="noreferrer">discord</a>
+          <a href={LINKS.instagram} target="_blank" rel="noreferrer">instagram</a>
           <a href={`mailto:${LINKS.email}?subject=Chalant%20merch`}>email</a>
         </nav>
       </footer>
@@ -225,10 +235,10 @@ function SideButton({
       <span className="side-word">
         <span className="side-highlight" aria-hidden />
         {word}
+        <svg className="side-scribble" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden>
+          <path d={SCRIBBLE} pathLength={1} />
+        </svg>
       </span>
-      <svg className="side-scribble" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden>
-        <path d={SCRIBBLE} pathLength={1} />
-      </svg>
     </button>
   );
 }
@@ -466,6 +476,7 @@ function Success({ shirt, already, sideWord, focusOnMount, nextShirt, onNext }: 
 
       <p className="success-links">
         <span>meanwhile:</span>
+        <a href="/#community">draw a dare</a>
         <a href={LINKS.discord} target="_blank" rel="noreferrer">
           join the discord
         </a>
