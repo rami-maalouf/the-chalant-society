@@ -72,7 +72,8 @@
   #coaching, #doors, #community { scroll-margin-top: 0; }
   /* keyboard focus is always visible */
   a:focus-visible, button:focus-visible, [role="button"]:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-  .copy { position: absolute; left: 7vw; top: 13vh; width: min(560px, 42vw); pointer-events: none; }
+  /* the text box grows with the screen, like the headline font, so big screens keep 2-3 line headlines */
+  .copy { position: absolute; left: 7vw; top: 13vh; width: min(1040px, 52vw); pointer-events: none; }
   .beat { position: absolute; top: 0; left: 0; width: 100%; opacity: 0; will-change: opacity, transform; }
   .beat h1, .beat h2 {
     font-family: 'Archivo', sans-serif; font-variation-settings: 'wdth' 74; font-weight: 800;
