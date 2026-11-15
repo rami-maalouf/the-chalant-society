@@ -28,6 +28,7 @@
   :root {
     --ink: #efe9dc;
     --text: #efe9dc;
+    --sky: #0b0e1f; /* the top of the sky, kept in step by the story script */
     --sw: 3px;
     --paper: #fffaf0;
     --tomato: #ff5a36;
@@ -48,11 +49,26 @@
   .hand { font-family: 'Caveat', cursive; font-weight: 700; }
 
   .bar { position: fixed; top: 0; left: 0; height: 3px; width: 100%; background: var(--tomato); transform-origin: 0 50%; transform: scaleX(0); z-index: 5; transition: opacity .4s; }
-  .brand { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 7vw; font-family: 'Martian Mono', monospace; font-variation-settings: 'wdth' 87; font-size: 11px; line-height: 1; letter-spacing: .06em; text-transform: uppercase; opacity: .75; }
-
-  .skip { position: absolute; z-index: 6; top: calc(14px + env(safe-area-inset-top)); right: 7vw; padding: 4px 0; color: inherit; text-decoration: none; opacity: .75;
-    font-family: 'Martian Mono', monospace; font-variation-settings: 'wdth' 87; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid currentColor; transition: opacity .3s; }
-  .skip:hover { opacity: 1; }
+  /* top bar: the brand in the headline's type on the left, instagram and the skip button on the right */
+  .brand { position: absolute; z-index: 6; top: calc(16px + env(safe-area-inset-top)); left: 7vw; padding: 6px 0; color: inherit; text-decoration: none;
+    font-family: 'Archivo', sans-serif; font-variation-settings: 'wdth' 74; font-weight: 800; font-size: 21px; line-height: 1; letter-spacing: -.02em; }
+  .top-right { position: absolute; z-index: 6; top: calc(14px + env(safe-area-inset-top)); right: 7vw; display: flex; align-items: center; gap: 10px; }
+  .ig, .skip { display: inline-flex; align-items: center; justify-content: center; height: 38px; border-radius: 99px; color: inherit; text-decoration: none;
+    box-shadow: inset 0 0 0 1.5px currentColor; background: color-mix(in srgb, currentColor 8%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: background-color .25s, transform .25s; }
+  .ig { width: 38px; }
+  .ig svg { width: 17px; height: 17px; }
+  /* the skip button is solid: the text color fills it and the sky color writes on it, so it stands out at every hour */
+  .skip { gap: 8px; padding: 0 16px; background: var(--text); color: var(--sky); box-shadow: none;
+    font-family: 'Archivo', sans-serif; font-variation-settings: 'wdth' 90; font-weight: 750; font-size: 14px; letter-spacing: -.005em; }
+  .skip .arw { display: inline-block; animation: nudge 1.8s ease-in-out infinite; }
+  @keyframes nudge { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(3px); } }
+  @media (hover: hover) {
+    .ig:hover { background: color-mix(in srgb, currentColor 20%, transparent); }
+    .skip:hover { transform: translateY(-1px); }
+    .skip:hover .arw { animation: none; transform: translateY(3px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .skip .arw { animation: none; } }
   #coaching, #doors, #community { scroll-margin-top: 0; }
   /* keyboard focus is always visible */
   a:focus-visible, button:focus-visible, [role="button"]:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
@@ -190,8 +206,11 @@
   .face.back .sig { font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; opacity: .6; }
 
   @media (max-width: 760px) {
-    .brand { left: 22px; }
-    .skip { right: 22px; }
+    .brand { left: 22px; font-size: 18px; }
+    .top-right { right: 22px; gap: 8px; }
+    .ig, .skip { height: 36px; }
+    .ig { width: 36px; }
+    .skip { padding: 0 14px; font-size: 13px; }
     .copy { left: 22px; right: 22px; width: auto; top: calc(9vh + env(safe-area-inset-top)); }
     .beat p { max-width: none; }
     .hud { left: 16px; right: 16px; width: auto; top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); transform: none; padding: 14px 16px 14px; }
@@ -220,8 +239,13 @@
 <div id="scroller">
   <div class="stage">
     <svg id="scene" aria-hidden="true"></svg>
-    <div class="brand">the chalant society</div>
-    <a class="skip" href="#coaching">skip the story <span aria-hidden="true">&darr;</span></a>
+    <a class="brand" href="/">the chalant society</a>
+    <div class="top-right">
+      <a class="ig" href="https://www.instagram.com/thechalantsociety/" rel="noopener" aria-label="the chalant society on instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="skip" href="#coaching">skip the story <span class="arw" aria-hidden="true">&darr;</span></a>
+    </div>
 
     <div class="copy">
       <div class="beat" data-a="0" data-b="0.08">
@@ -758,7 +782,7 @@
     bar.style.opacity = scrollY > scroller.offsetHeight ? 0 : 1;
 
     const [sky, skyM, skyB] = [0, 1, 2].map(i => kf(p, SKY.map(([q, v]) => [q, v[i]]), false));
-    sa(skyTop, 'stop-color', rgb(sky)); sa(skyMid, 'stop-color', rgb(skyM)); sa(skyBot, 'stop-color', rgb(skyB));
+    sa(skyTop, 'stop-color', rgb(sky)); setVar('--sky', rgb(sky)); sa(skyMid, 'stop-color', rgb(skyM)); sa(skyBot, 'stop-color', rgb(skyB));
     const night = 1 - seg(p, .42, .7);
     // the floor and skyline go through warm dawn colours, never flat grey
     const groundC = kf(p, GROUND, false), skylineC = mixArr(skyM, skyB, .5).map((v, i) => v * lerp(BUILDING[i], BUILDING_NIGHT[i], night));
