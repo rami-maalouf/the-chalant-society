@@ -393,6 +393,8 @@ Decided 2026-11-08: the page sells several shirts. Shirt 2 is **claude vs chatgp
 
 The Notion database keeps one row per email **per shirt**.
 
+Updated 2026-11-17: **claude vs chatgpt is first** (drop 01, the shirt the page opens on), chalant vs nonchalant is second (drop 02). The claude shirt prints a playful mark above each word: the orange claude spark and the woven chatgpt knot. Both are drawn from geometry in `src/merch/logos.ts`, which feeds the 3D print and the page. A shirt gets marks through its optional `marks` field in `SHIRTS`.
+
 **To add a shirt:**
 
 1. add an entry to `SHIRTS` in `src/merch/options.ts` (id, Notion item name, the two side words, drop label)

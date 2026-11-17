@@ -391,6 +391,44 @@ a {
   opacity: 0.38;
 }
 
+/* when the words carry marks, they sit lower: move the vs down with them */
+.debate-board:has(.has-mark) .debate-vs {
+  padding-top: clamp(3rem, 12vw, 4.2rem);
+}
+
+/* a brand mark above the word, for shirts that have one */
+.side {
+  --logo-halo: var(--cotton);
+}
+
+.side.has-mark {
+  padding-top: clamp(3rem, 12vw, 4.2rem);
+}
+
+.side-mark {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: clamp(2.3rem, 10vw, 3.2rem);
+  height: auto;
+  margin-bottom: 0.35rem;
+  overflow: visible;
+  transform: translateX(-50%);
+}
+
+.side.is-picked .side-mark {
+  animation: mark-wiggle 560ms var(--ease-out);
+}
+
+@keyframes mark-wiggle {
+  30% {
+    transform: translateX(-50%) rotate(-12deg) scale(1.12);
+  }
+  60% {
+    transform: translateX(-50%) rotate(8deg) scale(1.05);
+  }
+}
+
 .side-word {
   position: relative;
   isolation: isolate; /* keeps the highlighter above the button background */
@@ -901,6 +939,7 @@ a {
   }
 
   .side:hover {
+    --logo-halo: var(--cotton-deep);
     background: var(--cotton-deep);
   }
 

@@ -1,21 +1,30 @@
 // shared by the /merch page and api/merch-waitlist.ts, so both use the same lists
 
 // every shirt on the page. add a shirt here and the page, the 3d slider and the api all pick it up.
+// the first shirt is the one the page opens on.
 // `item` is the option in the notion "Item" column. `sides` are the two words, left then right.
 export const SHIRTS = [
-  {
-    id: "chalant-vs-nonchalant",
-    item: "chalant | nonchalant tee",
-    sides: ["chalant", "nonchalant"],
-    drop: "drop 01",
-  },
   {
     id: "claude-vs-chatgpt",
     item: "claude | chatgpt tee",
     sides: ["claude", "chatgpt"],
+    marks: ["claude", "chatgpt"],
+    drop: "drop 01",
+  },
+  {
+    id: "chalant-vs-nonchalant",
+    item: "chalant | nonchalant tee",
+    sides: ["chalant", "nonchalant"],
     drop: "drop 02",
   },
-] as const satisfies readonly { id: string; item: string; sides: readonly [string, string]; drop: string }[];
+] as const satisfies readonly {
+  id: string;
+  item: string;
+  sides: readonly [string, string];
+  // optional marks printed above each word (see logos.ts)
+  marks?: readonly ["claude" | "chatgpt", "claude" | "chatgpt"];
+  drop: string;
+}[];
 
 export type Shirt = (typeof SHIRTS)[number];
 export type ShirtId = Shirt["id"];

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type { Shirt } from "./options";
-import { DESIGN_H, DESIGN_W, drawBack, drawFront, type SideIndex, type Sides } from "./shirtArt";
+import { DESIGN_H, DESIGN_W, drawBack, drawFront, type ShirtArt, type SideIndex } from "./shirtArt";
 
 // three.js loads in its own chunk, after the page and the form already work
 const Shirt3D = lazy(() => import("./Shirt3D"));
@@ -15,7 +15,7 @@ function canUseWebGL(): boolean {
 }
 
 // the same artwork as the 3d shirt, flat. shown until the 3d shirt is ready, and on phones without webgl
-function FlatShirt({ sides, seed, side }: { sides: Sides; seed: number; side: SideIndex | null }) {
+function FlatShirt({ art, seed, side }: { art: ShirtArt; seed: number; side: SideIndex | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     let cancelled = false;
@@ -27,13 +27,13 @@ function FlatShirt({ sides, seed, side }: { sides: Sides; seed: number; side: Si
       .then(() => {
         const canvas = ref.current;
         if (cancelled || !canvas) return;
-        if (side === null) drawFront(canvas, sides);
-        else drawBack(canvas, sides, seed, side, 1);
+        if (side === null) drawFront(canvas, art);
+        else drawBack(canvas, art, seed, side, 1);
       });
     return () => {
       cancelled = true;
     };
-  }, [sides, seed, side]);
+  }, [art, seed, side]);
   return <canvas ref={ref} className="shirt-flat-canvas" width={DESIGN_W * 2} height={DESIGN_H * 2} />;
 }
 
@@ -48,7 +48,7 @@ export default function ShirtStage({ shirts, index, sides, onSelect }: Props) {
   const [webgl] = useState(canUseWebGL);
   const [ready, setReady] = useState(false);
   const shirt = shirts[index];
-  const words = useMemo(() => shirts.map((s) => s.sides as Sides), [shirts]);
+  const arts = useMemo(() => shirts.map((s): ShirtArt => ({ sides: s.sides, marks: "marks" in s ? s.marks : undefined })), [shirts]);
   const many = shirts.length > 1;
   const name = (s: Shirt) => `${s.sides[0]} vs ${s.sides[1]}`;
 
@@ -73,11 +73,11 @@ export default function ShirtStage({ shirts, index, sides, onSelect }: Props) {
     >
       <div className={`shirt-stage${ready ? " is-3d" : ""}`}>
         <div className="shirt-flat" aria-hidden={ready}>
-          <FlatShirt sides={words[index]} seed={index + 1} side={sides[index]} />
+          <FlatShirt art={arts[index]} seed={index + 1} side={sides[index]} />
         </div>
         {webgl && (
           <Suspense fallback={null}>
-            <Shirt3D shirts={words} index={index} sides={sides} onSelect={go} onReady={() => setReady(true)} />
+            <Shirt3D shirts={arts} index={index} sides={sides} onSelect={go} onReady={() => setReady(true)} />
           </Suspense>
         )}
       </div>

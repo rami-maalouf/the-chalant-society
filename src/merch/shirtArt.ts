@@ -1,8 +1,12 @@
 // the shirt artwork, drawn in code: the 3d shirts use it as textures, and the flat fallback
 // draws it straight into a canvas. design space is 300 x 340.
 
+import { drawLogo, type LogoId } from "./logos";
+
 // the two words of a shirt, left then right
 export type Sides = readonly [string, string];
+// what gets printed: the two words, and an optional mark above each one
+export type ShirtArt = { sides: Sides; marks?: readonly [LogoId, LogoId] };
 // which side the visitor picked: 0 = left, 1 = right
 export type SideIndex = 0 | 1;
 
@@ -113,8 +117,8 @@ function condensed(ctx: Ctx) {
   if ("fontStretch" in ctx) (ctx as Ctx & { fontStretch: string }).fontStretch = "condensed";
 }
 
-export function drawFront(canvas: HTMLCanvasElement, sides: Sides) {
-  const [leftWord, rightWord] = sides;
+export function drawFront(canvas: HTMLCanvasElement, art: ShirtArt) {
+  const [leftWord, rightWord] = art.sides;
   const ctx = prepare(canvas, FRONT_NECK);
   ctx.fillStyle = INK;
   ctx.textBaseline = "alphabetic";
@@ -144,6 +148,14 @@ export function drawFront(canvas: HTMLCanvasElement, sides: Sides) {
   x += vsWidth + gap;
   ctx.font = block(wordSize);
   ctx.fillText(rightWord, x, y);
+
+  // a mark above each word, when the shirt has them
+  if (art.marks) {
+    const start = 150 - total / 2;
+    const markY = y - wordSize * 0.72 - 17;
+    drawLogo(ctx, art.marks[0], start + left / 2, markY, 26, COTTON);
+    drawLogo(ctx, art.marks[1], start + total - right / 2, markY, 26, COTTON);
+  }
 
   ctx.textAlign = "center";
   ctx.font = marker(12);
@@ -219,11 +231,12 @@ const VISITOR_SLOT = [
 
 export function drawBack(
   canvas: HTMLCanvasElement,
-  sides: Sides,
+  art: ShirtArt,
   seed: number,
   visitorSide: SideIndex | null,
   progress: number,
 ) {
+  const { sides } = art;
   const ctx = prepare(canvas, BACK_NECK);
   ctx.fillStyle = INK;
   condensed(ctx);
@@ -234,6 +247,10 @@ export function drawBack(
   ctx.fillText(sides[0], 143, 72);
   ctx.textAlign = "left";
   ctx.fillText(sides[1], 157, 72);
+  if (art.marks) {
+    drawLogo(ctx, art.marks[0], 143 - ctx.measureText(sides[0]).width / 2, 49, 18, COTTON);
+    drawLogo(ctx, art.marks[1], 157 + ctx.measureText(sides[1]).width / 2, 49, 18, COTTON);
+  }
 
   ctx.strokeStyle = INK;
   ctx.lineCap = "round";

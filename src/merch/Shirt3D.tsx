@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { DESIGN_H, DESIGN_W, drawBack, drawFront, silhouettePath, type SideIndex, type Sides } from "./shirtArt";
+import { DESIGN_H, DESIGN_W, drawBack, drawFront, silhouettePath, type ShirtArt, type SideIndex } from "./shirtArt";
 
 // world units: 1 unit = 100 design px
 const WORLD_W = DESIGN_W / 100;
@@ -186,7 +186,7 @@ function buildGeometry(): THREE.PlaneGeometry {
 }
 
 type ShirtItem = {
-  sides: Sides;
+  art: ShirtArt;
   seed: number;
   group: THREE.Group;
   materials: THREE.MeshPhysicalMaterial[];
@@ -207,7 +207,7 @@ type ShirtItem = {
 
 function createShowroom(
   container: HTMLElement,
-  shirts: Sides[],
+  shirts: ShirtArt[],
   startIndex: number,
   reducedMotion: boolean,
   onSelect: (index: number) => void,
@@ -269,7 +269,7 @@ function createShowroom(
   const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
   const shadowGeometry = new THREE.PlaneGeometry(2.8, 0.7);
 
-  const items: ShirtItem[] = shirts.map((sides, index) => {
+  const items: ShirtItem[] = shirts.map((art, index) => {
     const frontCanvas = makeCanvas();
     const backCanvas = makeCanvas();
     const frontTexture = toTexture(frontCanvas);
@@ -291,7 +291,7 @@ function createShowroom(
     scene.add(group, shadow);
     group.userData.shadow = shadow;
     return {
-      sides,
+      art,
       seed: index + 1,
       group,
       materials: [frontMaterial, backMaterial],
@@ -400,7 +400,7 @@ function createShowroom(
     tick++;
     for (const item of items) {
       if (item.backDirty && (tick % 2 === 0 || item.signature >= 1)) {
-        drawBack(item.backCanvas, item.sides, item.seed, item.side, item.signature);
+        drawBack(item.backCanvas, item.art, item.seed, item.side, item.signature);
         item.backTexture.needsUpdate = true;
         item.backDirty = false;
       }
@@ -510,8 +510,8 @@ function createShowroom(
     .then(() => {
       if (disposed) return;
       for (const item of items) {
-        drawFront(item.frontCanvas, item.sides);
-        drawBack(item.backCanvas, item.sides, item.seed, item.side, item.signature);
+        drawFront(item.frontCanvas, item.art);
+        drawBack(item.backCanvas, item.art, item.seed, item.side, item.signature);
         for (const texture of item.textures) texture.needsUpdate = true;
       }
       resize();
@@ -569,7 +569,7 @@ function createShowroom(
 }
 
 type Shirt3DProps = {
-  shirts: Sides[];
+  shirts: ShirtArt[];
   index: number;
   sides: (SideIndex | null)[];
   onSelect: (index: number) => void;

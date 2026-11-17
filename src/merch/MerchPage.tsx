@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { LINKS } from "../shared/links";
 import ShirtStage from "./ShirtStage";
+import { LOGOS, type LogoId } from "./logos";
 import type { SideIndex } from "./shirtArt";
 import {
   SHIRTS,
@@ -118,11 +119,11 @@ export default function MerchPage() {
 
           <p className="hand debate-kicker">settle a debate</p>
           <div className="debate-board" role="group" aria-label="pick a side">
-            <SideButton word={shirt.sides[0]} position={0} picked={side} onPick={pick} />
+            <SideButton word={shirt.sides[0]} mark={marksOf(shirt)?.[0]} position={0} picked={side} onPick={pick} />
             <span className="debate-vs hand" aria-hidden>
               vs
             </span>
-            <SideButton word={shirt.sides[1]} position={1} picked={side} onPick={pick} />
+            <SideButton word={shirt.sides[1]} mark={marksOf(shirt)?.[1]} position={1} picked={side} onPick={pick} />
           </div>
 
           <p className="hand debate-prompt" aria-live="polite">
@@ -212,13 +213,45 @@ export default function MerchPage() {
   );
 }
 
+const marksOf = (shirt: Shirt) => ("marks" in shirt ? shirt.marks : undefined);
+
+// the same mark as on the shirt print. the knot's gaps take the button's own background (--logo-halo)
+function Mark({ id }: { id: LogoId }) {
+  const logo = LOGOS[id];
+  return (
+    <svg className={`side-mark side-mark-${id}`} viewBox="0 0 100 100" aria-hidden>
+      <g transform={`rotate(${logo.tilt} 50 50)`}>
+        {logo.kind === "fill" ? (
+          <path d={logo.d} fill={logo.color} />
+        ) : (
+          [...logo.under, ...logo.over].map((d, i) => (
+            <g key={i}>
+              <path d={d} fill="none" strokeWidth={logo.halo} style={{ stroke: "var(--logo-halo)" }} />
+              <path
+                d={d}
+                fill="none"
+                stroke={logo.color}
+                strokeWidth={logo.ink}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+          ))
+        )}
+      </g>
+    </svg>
+  );
+}
+
 function SideButton({
   word,
+  mark,
   position,
   picked,
   onPick,
 }: {
   word: string;
+  mark?: LogoId;
   position: SideIndex;
   picked: SideIndex | null;
   onPick: (side: SideIndex) => void;
@@ -228,11 +261,12 @@ function SideButton({
   return (
     <button
       type="button"
-      className={`side side-${position === 0 ? "left" : "right"}${isPicked ? " is-picked" : ""}${isOther ? " is-other" : ""}`}
+      className={`side side-${position === 0 ? "left" : "right"}${mark ? " has-mark" : ""}${isPicked ? " is-picked" : ""}${isOther ? " is-other" : ""}`}
       aria-pressed={isPicked}
       onClick={() => onPick(position)}
     >
       <span className="side-word">
+        {mark && <Mark id={mark} />}
         <span className="side-highlight" aria-hidden />
         {word}
         <svg className="side-scribble" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden>
